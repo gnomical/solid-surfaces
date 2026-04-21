@@ -1,0 +1,36 @@
+/* Drawer is always absolutely positioned, anchored to its edge */
+.drawer {
+  position: absolute;
+  z-index: 20;
+  overflow: hidden;
+}
+
+.drawer[data-ss-edge="left"] {
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.drawer[data-ss-edge="right"] {
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.drawer[data-ss-edge="top"] {
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.drawer[data-ss-edge="bottom"] {
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Hidden state — consumers can override with CSS transitions on [data-ss-state] */
+.hidden {
+  pointer-events: none;
+  visibility: hidden;
+}
