@@ -1,6 +1,7 @@
 import { createSignal, For } from "solid-js"
 import { LayoutRoot, Rail, Drawer, Body } from "solid-surfaces"
 import "./app.css"
+import { SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
 
 const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -29,11 +30,11 @@ export default function App() {
       </Rail>
 
       {/* Top rail — hides on scroll down, reveals on scroll up */}
-      <Rail edge="top" reveal="scroll-toward" size="48px">
-        <header class="top-rail">
+      <Rail edge="top" reveal="scroll-toward" size="60px">
+        <header class="surface horizontal" style={{ "border-color": "pink" }}>
           <span>Top Rail — reveal: scroll-toward</span>
-          <button onClick={() => setDrawerOpen((v) => !v)}>
-            {drawerOpen() ? "Close" : "Open"} Bottom Drawer
+          <button onClick={() => setDrawerOpen((v) => !v)} style="transform: rotate(-90deg)">
+            {drawerOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
           </button>
         </header>
       </Rail>
@@ -58,8 +59,7 @@ export default function App() {
       </Body>
 
       {/* Bottom drawer — overlay, controlled open state */}
-      <Drawer edge="bottom" open={drawerOpen()} size="200px">
-        <div class="bottom-drawer">
+      <Drawer class="surface" edge="bottom" open={drawerOpen()} size="200px">
           <strong>Bottom Drawer</strong>
           <span class="chip" style={{ "margin-left": "0.5rem" }}>
             Drawer edge="bottom"
@@ -67,7 +67,6 @@ export default function App() {
           <p style={{ "margin-top": "0.5rem" }}>
             This is an overlay surface. It does not affect the grid layout.
           </p>
-        </div>
       </Drawer>
     </LayoutRoot>
   )
