@@ -139,7 +139,7 @@ export function Rail(props: RailProps) {
   })
 
   const inlineStyle = (): JSX.CSSProperties => ({
-    ...(isOverlay() ? sizeStyle(props.edge, size()) : {}),
+    ...(isOverlay() ? sizeStyle(props.edge, size()) : { "grid-area": props.edge }),
     ...props.style,
   })
 
