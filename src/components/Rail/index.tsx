@@ -63,10 +63,14 @@ export function Rail(props: RailProps) {
       virtualPos = Math.min(Math.max(0, virtualPos + delta), railPx)
       lastScrollPos = scrollPos
 
-      const atBottom = props.edge === "left" || props.edge === "right"
+      const horizontal = props.edge === "left" || props.edge === "right"
+      const atTop = scrollPos <= 0
+      const atBottom = horizontal
         ? scrollPos >= el.scrollWidth - el.clientWidth - 1
         : scrollPos >= el.scrollHeight - el.clientHeight - 1
-      if (atBottom) virtualPos = railPx
+
+      if (atTop) virtualPos = 0
+      else if (atBottom) virtualPos = railPx
 
       updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
     }
