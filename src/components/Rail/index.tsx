@@ -58,10 +58,16 @@ export function Rail(props: RailProps) {
     let lastScrollPos = 0
     let virtualPos = 0  // tracks header visibility independent of absolute scroll position
 
-    function sync(scrollPos: number) {
+    function sync(scrollPos: number, el: HTMLElement) {
       const delta = scrollPos - lastScrollPos
       virtualPos = Math.min(Math.max(0, virtualPos + delta), railPx)
       lastScrollPos = scrollPos
+
+      const atBottom = props.edge === "left" || props.edge === "right"
+        ? scrollPos >= el.scrollWidth - el.clientWidth - 1
+        : scrollPos >= el.scrollHeight - el.clientHeight - 1
+      if (atBottom) virtualPos = railPx
+
       updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
     }
 
@@ -69,7 +75,7 @@ export function Rail(props: RailProps) {
       const scrollPos = props.edge === "left" || props.edge === "right"
         ? this.scrollLeft
         : this.scrollTop
-      sync(scrollPos)
+      sync(scrollPos, this)
     }
 
     createEffect(() => {
