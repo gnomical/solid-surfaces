@@ -1,7 +1,7 @@
 import { createSignal, For } from "solid-js"
 import { LayoutRoot, Rail, Drawer, Body } from "solid-surfaces"
 import "./app.css"
-import { SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
+import { CLOSE_ICON, SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
 
 const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -17,7 +17,7 @@ export default function App() {
     <LayoutRoot>
       {/* Left rail — reserved on desktop, overlay on mobile */}
       <Rail edge="left" responsive breakpoint={768} size="220px">
-        <nav class="left-rail">
+        <nav class="surface vertical" style={{ "border-color": "green" }}>
           <strong>solid-surfaces</strong>
           <hr style={{ "border-color": "#333", margin: "0.25rem 0" }} />
           <span>Nav item 1</span>
@@ -59,7 +59,8 @@ export default function App() {
       </Body>
 
       {/* Bottom drawer — overlay, controlled open state */}
-      <Drawer class="surface" edge="bottom" open={drawerOpen()} size="200px">
+      <Drawer edge="bottom" open={drawerOpen()} size="200px">
+        <div class="surface">
           <strong>Bottom Drawer</strong>
           <span class="chip" style={{ "margin-left": "0.5rem" }}>
             Drawer edge="bottom"
@@ -67,6 +68,10 @@ export default function App() {
           <p style={{ "margin-top": "0.5rem" }}>
             This is an overlay surface. It does not affect the grid layout.
           </p>
+          <button onClick={() => setDrawerOpen(false)} class="close">  
+            {CLOSE_ICON()}
+          </button>
+        </div>
       </Drawer>
     </LayoutRoot>
   )

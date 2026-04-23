@@ -32,7 +32,23 @@ button {
 }
 
 button:hover {
-  background: #ffffff22;
+  background: #00000011;
+}
+
+.close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.chip {
+  display: inline-block;
+  background: #333;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: monospace;
 }
 
 /* Surface styling — consumers own this */
@@ -57,33 +73,6 @@ button:hover {
   flex-direction: column;
 }
 
-
-.left-rail {
-  background: #1a1a2e;
-  color: #eee;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* .top-rail {
-  background: #16213e;
-  color: #eee;
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-} */
-
-/* .bottom-drawer {
-  height: 100%;
-  background: #0f3460;
-  color: #eee;
-  padding: 1rem;
-  overflow: auto;
-} */
-
 .body-content {
   padding: 1.5rem;
   display: flex;
@@ -100,16 +89,4 @@ button:hover {
   line-height: 1.6;
   color: #444;
   max-width: 60ch;
-}
-
-
-
-.chip {
-  display: inline-block;
-  background: #333;
-  color: #fff;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-family: monospace;
 }
