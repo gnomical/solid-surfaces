@@ -96,3 +96,23 @@ export type DrawerProps = {
   class?: string
   style?: JSX.CSSProperties
 }
+
+export type SurfaceProps = {
+  edge: Edge
+  /** Whether to render as overlay (absolute) vs reserved (grid-area). Default: false */
+  overlay?: boolean
+  occupancy?: Occupancy
+  reveal?: Reveal
+  visibility?: Visibility
+  size: string
+  order?: number
+  /** z-index for overlay mode. Default: 10 */
+  zIndex?: number
+  /** Value for data-ss-surface attribute. Default: "surface" */
+  surfaceType?: string
+  children?: JSX.Element
+  class?: string
+  style?: JSX.CSSProperties
+  /** Callback that receives the SurfaceHandle after mount */
+  ref?: (handle: SurfaceHandle) => void
+}

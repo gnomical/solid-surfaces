@@ -1,26 +1,13 @@
 import {
   createEffect,
   createSignal,
-  JSX,
   onCleanup,
   onMount,
 } from "solid-js"
-import { createSurface, useLayout } from "../../context/LayoutContext"
+import { useLayout } from "../../context/LayoutContext"
 import { DEFAULT_BREAKPOINT, DEFAULT_RAIL_SIZE, POINTER_PROXIMITY_THRESHOLD, SCROLL_TOWARD_THRESHOLD } from "../../lib/constants"
-import type { Edge, Occupancy, RailProps, Visibility } from "../../lib/types"
-import styles from "./Rail.module.css"
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function isHorizontal(edge: Edge) {
-  return edge === "left" || edge === "right"
-}
-
-function sizeStyle(edge: Edge, size: string): JSX.CSSProperties {
-  return isHorizontal(edge) ? { width: size } : { height: size }
-}
-
-// ─── Rail ─────────────────────────────────────────────────────────────────────
+import type { Occupancy, RailProps, SurfaceHandle, Visibility } from "../../lib/types"
+import { Surface } from "../Surface"
 
 export function Rail(props: RailProps) {
   const { updateSurface } = useLayout()
@@ -30,23 +17,15 @@ export function Rail(props: RailProps) {
   const breakpoint = () => props.breakpoint ?? DEFAULT_BREAKPOINT
   const initialOccupancy: Occupancy = props.occupancy ?? "reserved"
 
-  // Responsive: track whether we're in overlay mode due to narrow viewport
   const [overlayMode, setOverlayMode] = createSignal(false)
-
   const effectiveOccupancy = (): Occupancy =>
     overlayMode() ? "none" : initialOccupancy
 
-  const handle = createSurface({
-    edge: props.edge,
-    occupancy: effectiveOccupancy(),
-    reveal: reveal(),
-    size: size(),
-    order: props.order ?? 0,
-  })
+  let handle!: SurfaceHandle
 
   // Sync occupancy changes back to context
   createEffect(() => {
-    updateSurface(handle.id, { occupancy: effectiveOccupancy() })
+    if (handle) updateSurface(handle.id, { occupancy: effectiveOccupancy() })
   })
 
   // ── Responsive breakpoint ────────────────────────────────────────────────────
@@ -56,11 +35,7 @@ export function Rail(props: RailProps) {
     const mq = window.matchMedia(`(max-width: ${breakpoint() - 1}px)`)
     const handler = (e: MediaQueryListEvent | MediaQueryList) => {
       setOverlayMode(e.matches)
-      if (e.matches) {
-        handle.setVisibility("hidden")
-      } else {
-        handle.setVisibility("visible")
-      }
+      if (handle) handle.setVisibility(e.matches ? "hidden" : "visible")
     }
     handler(mq)
     mq.addEventListener("change", handler as (e: MediaQueryListEvent) => void)
@@ -79,14 +54,13 @@ export function Rail(props: RailProps) {
     function onScroll() {
       const dy = window.scrollY - lastScrollY
       const dx = window.scrollX - lastScrollX
-
       const edge = props.edge
-      let scrollingToward = false
 
-      if (edge === "top" && dy < -SCROLL_TOWARD_THRESHOLD) scrollingToward = true
-      if (edge === "bottom" && dy > SCROLL_TOWARD_THRESHOLD) scrollingToward = true
-      if (edge === "left" && dx < -SCROLL_TOWARD_THRESHOLD) scrollingToward = true
-      if (edge === "right" && dx > SCROLL_TOWARD_THRESHOLD) scrollingToward = true
+      const scrollingToward =
+        (edge === "top" && dy < -SCROLL_TOWARD_THRESHOLD) ||
+        (edge === "bottom" && dy > SCROLL_TOWARD_THRESHOLD) ||
+        (edge === "left" && dx < -SCROLL_TOWARD_THRESHOLD) ||
+        (edge === "right" && dx > SCROLL_TOWARD_THRESHOLD)
 
       const scrollingAway =
         (edge === "top" && dy > SCROLL_TOWARD_THRESHOLD) ||
@@ -127,32 +101,21 @@ export function Rail(props: RailProps) {
     onCleanup(() => window.removeEventListener("pointermove", onPointerMove))
   })
 
-  // ── Render ───────────────────────────────────────────────────────────────────
-
-  const isOverlay = () => overlayMode() || effectiveOccupancy() === "none"
-  const isHidden = () => handle.visibility() === "hidden"
-
-  const classList = () => ({
-    [styles.rail]: !isOverlay(),
-    [styles.overlay]: isOverlay(),
-    [styles.hidden]: isHidden(),
-  })
-
-  const inlineStyle = (): JSX.CSSProperties => ({
-    ...(isOverlay() ? sizeStyle(props.edge, size()) : { "grid-area": props.edge }),
-    ...props.style,
-  })
-
   return (
-    <div
+    <Surface
+      ref={(h) => { handle = h }}
+      edge={props.edge}
+      overlay={overlayMode() || effectiveOccupancy() === "none"}
+      occupancy={effectiveOccupancy()}
+      reveal={reveal()}
+      size={size()}
+      order={props.order ?? 0}
+      zIndex={10}
+      surfaceType="rail"
       class={props.class}
-      classList={classList()}
-      style={inlineStyle()}
-      data-ss-surface="rail"
-      data-ss-edge={props.edge}
-      data-ss-state={handle.visibility()}
+      style={props.style}
     >
       {props.children}
-    </div>
+    </Surface>
   )
 }
