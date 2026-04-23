@@ -56,10 +56,39 @@ export function Rail(props: RailProps) {
     let railPx = 0
     let attached: HTMLElement | null = null
     let lastScrollPos = 0
+    let lastDelta = 0
     let virtualPos = 0  // tracks header visibility independent of absolute scroll position
+    let rafId: number | null = null
+
+    function commit() {
+      updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
+    }
+
+    function snapTo(target: number) {
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      function step() {
+        const diff = target - virtualPos
+        if (Math.abs(diff) <= 1) {
+          virtualPos = target
+          commit()
+          rafId = null
+          return
+        }
+        virtualPos += diff * 0.2
+        commit()
+        rafId = requestAnimationFrame(step)
+      }
+      rafId = requestAnimationFrame(step)
+    }
+
+    function onScrollEnd() {
+      if (virtualPos === 0 || virtualPos === railPx) return
+      snapTo(lastDelta > 0 ? railPx : 0)
+    }
 
     function sync(scrollPos: number, el: HTMLElement) {
       const delta = scrollPos - lastScrollPos
+      if (delta !== 0) lastDelta = delta
       virtualPos = Math.min(Math.max(0, virtualPos + delta), railPx)
       lastScrollPos = scrollPos
 
@@ -72,10 +101,11 @@ export function Rail(props: RailProps) {
       if (atTop) virtualPos = 0
       else if (atBottom) virtualPos = railPx
 
-      updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
+      commit()
     }
 
     function onScroll(this: HTMLElement) {
+      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null }
       const scrollPos = props.edge === "left" || props.edge === "right"
         ? this.scrollLeft
         : this.scrollTop
@@ -85,6 +115,8 @@ export function Rail(props: RailProps) {
     createEffect(() => {
       if (attached) {
         attached.removeEventListener("scroll", onScroll as EventListener)
+        attached.removeEventListener("scrollend", onScrollEnd)
+        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null }
         attached = null
       }
       const container = scrollContainer()
@@ -97,14 +129,19 @@ export function Rail(props: RailProps) {
           : container.scrollTop
         lastScrollPos = scrollPos
         virtualPos = Math.min(scrollPos, railPx)
-        updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
+        commit()
         container.addEventListener("scroll", onScroll as EventListener, { passive: true })
+        container.addEventListener("scrollend", onScrollEnd, { passive: true })
         attached = container
       }
     })
 
     onCleanup(() => {
-      if (attached) attached.removeEventListener("scroll", onScroll as EventListener)
+      if (attached) {
+        attached.removeEventListener("scroll", onScroll as EventListener)
+        attached.removeEventListener("scrollend", onScrollEnd)
+      }
+      if (rafId !== null) cancelAnimationFrame(rafId)
     })
   })
 
