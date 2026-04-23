@@ -21,6 +21,8 @@ export type SurfaceDescriptor = {
   size: string
   /** Stacking order among surfaces on the same edge. Lower = closer to center. */
   order: number
+  /** Runtime override for grid track size (e.g. scroll-coupled shrinking). */
+  currentSize?: string
 }
 
 export type RegisteredSurface = SurfaceDescriptor & { id: string }
@@ -32,6 +34,8 @@ export type LayoutContextValue = {
   registerSurface: (descriptor: SurfaceDescriptor) => string
   unregisterSurface: (id: string) => void
   updateSurface: (id: string, updates: Partial<SurfaceDescriptor>) => void
+  scrollContainer: Accessor<HTMLElement | null>
+  setScrollContainer: (el: HTMLElement | null) => void
 }
 
 // ─── createSurface ────────────────────────────────────────────────────────────
@@ -115,4 +119,6 @@ export type SurfaceProps = {
   style?: JSX.CSSProperties
   /** Callback that receives the SurfaceHandle after mount */
   ref?: (handle: SurfaceHandle) => void
+  /** Callback that receives the root DOM element after mount */
+  domRef?: (el: HTMLElement) => void
 }

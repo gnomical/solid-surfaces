@@ -22,6 +22,7 @@ let idCounter = 0
 
 export function LayoutProvider(props: { children: any }) {
   const [surfaces, setSurfaces] = createSignal<RegisteredSurface[]>([])
+  const [scrollContainer, setScrollContainer] = createSignal<HTMLElement | null>(null)
 
   function registerSurface(descriptor: SurfaceDescriptor): string {
     const id = `ss-surface-${++idCounter}`
@@ -40,7 +41,7 @@ export function LayoutProvider(props: { children: any }) {
   }
 
   return (
-    <LayoutContext.Provider value={{ surfaces, registerSurface, unregisterSurface, updateSurface }}>
+    <LayoutContext.Provider value={{ surfaces, registerSurface, unregisterSurface, updateSurface, scrollContainer, setScrollContainer }}>
       {props.children}
     </LayoutContext.Provider>
   )

@@ -6,10 +6,12 @@ import type { Edge, LayoutRootProps, RegisteredSurface } from "../../lib/types"
 // ─── Grid computation ─────────────────────────────────────────────────────────
 
 function reservedSize(surfaces: RegisteredSurface[], edge: Edge): string {
-  const s = surfaces.find((s) => s.edge === edge && s.occupancy === "reserved")
+  const s = surfaces.find(
+    (s) => s.edge === edge && (s.occupancy === "reserved" || s.occupancy === "visible-driven")
+  )
   if (!s) return "0px"
   if (s.occupancy === "visible-driven" && s.visibility === "hidden") return "0px"
-  return s.size
+  return s.currentSize ?? s.size
 }
 
 // ─── Inner component (has access to context) ──────────────────────────────────

@@ -3,14 +3,16 @@ import {
   createSignal,
   onCleanup,
   onMount,
+  type JSX,
 } from "solid-js"
 import { useLayout } from "../../context/LayoutContext"
-import { DEFAULT_BREAKPOINT, DEFAULT_RAIL_SIZE, POINTER_PROXIMITY_THRESHOLD, SCROLL_TOWARD_THRESHOLD } from "../../lib/constants"
+import { DEFAULT_BREAKPOINT, DEFAULT_RAIL_SIZE, POINTER_PROXIMITY_THRESHOLD } from "../../lib/constants"
 import type { Occupancy, RailProps, SurfaceHandle, Visibility } from "../../lib/types"
 import { Surface } from "../Surface"
 
+
 export function Rail(props: RailProps) {
-  const { updateSurface } = useLayout()
+  const { updateSurface, scrollContainer } = useLayout()
 
   const size = () => props.size ?? DEFAULT_RAIL_SIZE
   const reveal = () => props.reveal ?? "always"
@@ -21,7 +23,10 @@ export function Rail(props: RailProps) {
   const effectiveOccupancy = (): Occupancy =>
     overlayMode() ? "none" : initialOccupancy
 
+  const scrollStyle = (): JSX.CSSProperties => props.style ?? {}
+
   let handle!: SurfaceHandle
+  let railEl!: HTMLElement
 
   // Sync occupancy changes back to context
   createEffect(() => {
@@ -48,35 +53,49 @@ export function Rail(props: RailProps) {
   onMount(() => {
     if (reveal() !== "scroll-toward") return
 
-    let lastScrollY = window.scrollY
-    let lastScrollX = window.scrollX
+    let railPx = 0
+    let attached: HTMLElement | null = null
+    let lastScrollPos = 0
+    let virtualPos = 0  // tracks header visibility independent of absolute scroll position
 
-    function onScroll() {
-      const dy = window.scrollY - lastScrollY
-      const dx = window.scrollX - lastScrollX
-      const edge = props.edge
-
-      const scrollingToward =
-        (edge === "top" && dy < -SCROLL_TOWARD_THRESHOLD) ||
-        (edge === "bottom" && dy > SCROLL_TOWARD_THRESHOLD) ||
-        (edge === "left" && dx < -SCROLL_TOWARD_THRESHOLD) ||
-        (edge === "right" && dx > SCROLL_TOWARD_THRESHOLD)
-
-      const scrollingAway =
-        (edge === "top" && dy > SCROLL_TOWARD_THRESHOLD) ||
-        (edge === "bottom" && dy < -SCROLL_TOWARD_THRESHOLD) ||
-        (edge === "left" && dx > SCROLL_TOWARD_THRESHOLD) ||
-        (edge === "right" && dx < -SCROLL_TOWARD_THRESHOLD)
-
-      if (scrollingToward) handle.setVisibility("visible")
-      else if (scrollingAway) handle.setVisibility("hidden")
-
-      lastScrollY = window.scrollY
-      lastScrollX = window.scrollX
+    function sync(scrollPos: number) {
+      const delta = scrollPos - lastScrollPos
+      virtualPos = Math.min(Math.max(0, virtualPos + delta), railPx)
+      lastScrollPos = scrollPos
+      updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
     }
 
-    window.addEventListener("scroll", onScroll, { passive: true })
-    onCleanup(() => window.removeEventListener("scroll", onScroll))
+    function onScroll(this: HTMLElement) {
+      const scrollPos = props.edge === "left" || props.edge === "right"
+        ? this.scrollLeft
+        : this.scrollTop
+      sync(scrollPos)
+    }
+
+    createEffect(() => {
+      if (attached) {
+        attached.removeEventListener("scroll", onScroll as EventListener)
+        attached = null
+      }
+      const container = scrollContainer()
+      if (container) {
+        railPx = railEl.getBoundingClientRect()[
+          props.edge === "left" || props.edge === "right" ? "width" : "height"
+        ]
+        const scrollPos = props.edge === "left" || props.edge === "right"
+          ? container.scrollLeft
+          : container.scrollTop
+        lastScrollPos = scrollPos
+        virtualPos = Math.min(scrollPos, railPx)
+        updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
+        container.addEventListener("scroll", onScroll as EventListener, { passive: true })
+        attached = container
+      }
+    })
+
+    onCleanup(() => {
+      if (attached) attached.removeEventListener("scroll", onScroll as EventListener)
+    })
   })
 
   // ── Reveal: pointer-proximity ────────────────────────────────────────────────
@@ -104,6 +123,7 @@ export function Rail(props: RailProps) {
   return (
     <Surface
       ref={(h) => { handle = h }}
+      domRef={(el) => { railEl = el }}
       edge={props.edge}
       overlay={overlayMode() || effectiveOccupancy() === "none"}
       occupancy={effectiveOccupancy()}
@@ -113,7 +133,7 @@ export function Rail(props: RailProps) {
       zIndex={10}
       surfaceType="rail"
       class={props.class}
-      style={props.style}
+      style={scrollStyle()}
     >
       {props.children}
     </Surface>

@@ -37,6 +37,7 @@ export function Surface(props: SurfaceProps) {
 
   return (
     <div
+      ref={(el) => props.domRef?.(el)}
       class={props.class}
       classList={{
         [styles.surface]: !props.overlay,
