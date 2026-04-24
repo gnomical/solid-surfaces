@@ -75,13 +75,21 @@ button:hover {
 }
 
 /* Surface styling — consumers own this */
-.surface {
+.root {
+  inset: 8px;
+  border-radius: 20px;
   --border-size: 0.2rem;
+  --stp-foreground: #111;
+  --border: var(--border-size) solid var(--stp-foreground);
+  border: var(--border);
+}
+
+.surface {
   height: 100%;
-  background: #ffffff;
-  border: var(--border-size) solid #111;
+  background: #ffffffaa;
+  /* border: var(--border-size) solid #111; */
   box-sizing: border-box;
-  backdrop-filter: blur(7px);
+  backdrop-filter: blur(12px);
   padding: 0.5rem;
   overflow: auto;
   display: flex;
@@ -91,12 +99,34 @@ button:hover {
 .surface.horizontal {
   align-items: center;
   justify-content: space-between;
-  border-width: var(--border-size) 0;
+  /* border-width: var(--border-size) 0; */
 }
 
 .surface.vertical {
   flex-direction: column;
-  border-width: 0 var(--border-size);
+  /* border-width: 0 var(--border-size); */
+}
+
+.drawer {
+  height: 200px;
+  align-items: flex-start;
+  border: var(--border);
+  border-radius: 1rem;
+  margin: 0 1rem 1rem;
+}
+
+.header {
+  min-height: 3rem;
+  border-radius: 1rem 1rem 0 0;
+  border-bottom: var(--border);
+  padding: 1rem;
+}
+
+.nav {
+  width: 220px;
+  height: calc(100% + var(--border-size));
+  transform: translateY(calc(-1 * var(--border-size)));
+  border-right: var(--border);
 }
 
 .body-content {

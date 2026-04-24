@@ -17,12 +17,12 @@ export type SurfaceDescriptor = {
   occupancy: Occupancy
   visibility: Visibility
   reveal: Reveal
-  /** Size along the surface's axis (CSS string, e.g. "240px", "20rem"). */
-  size: string
+  /** Measured border-box size along the surface's axis; set by ResizeObserver. "0px" until first measure. */
+  actualSize: string
   /** Stacking order among surfaces on the same edge. Lower = closer to center. */
   order: number
-  /** Runtime override for grid track size (e.g. scroll-coupled shrinking). */
-  currentSize?: string
+  /** Grid track override (e.g. scroll-coupled partial reveal). When set, takes precedence over actualSize. */
+  reservedSize?: string
 }
 
 export type RegisteredSurface = SurfaceDescriptor & { id: string }
@@ -45,7 +45,6 @@ export type CreateSurfaceOptions = {
   occupancy?: Occupancy
   visibility?: Visibility
   reveal?: Reveal
-  size?: string
   order?: number
 }
 
@@ -53,6 +52,8 @@ export type SurfaceHandle = {
   id: string
   visibility: Accessor<Visibility>
   setVisibility: (v: Visibility) => void
+  actualSize: Accessor<string>
+  setActualSize: (v: string) => void
   surface: Accessor<RegisteredSurface | undefined>
 }
 
@@ -81,8 +82,6 @@ export type RailProps = {
   breakpoint?: number
   /** When true, switches from reserved to overlay below `breakpoint`. */
   responsive?: boolean
-  /** Size along the surface's axis. Default: "240px" */
-  size?: string
   /** Stacking order among same-edge surfaces. Default: 0 */
   order?: number
   class?: string
@@ -93,8 +92,6 @@ export type DrawerProps = {
   edge: Edge
   open: boolean
   children?: JSX.Element
-  /** Size along the surface's axis. Default: "300px" */
-  size?: string
   /** Stacking order among same-edge surfaces. Default: 0 */
   order?: number
   class?: string
@@ -108,7 +105,6 @@ export type SurfaceProps = {
   occupancy?: Occupancy
   reveal?: Reveal
   visibility?: Visibility
-  size: string
   order?: number
   /** z-index for overlay mode. Default: 10 */
   zIndex?: number

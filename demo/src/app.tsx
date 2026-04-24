@@ -14,10 +14,10 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = createSignal(false)
 
   return (
-    <LayoutRoot>
+    <LayoutRoot class="root">
       {/* Left rail — reserved on desktop, overlay on mobile */}
-      <Rail edge="left" responsive breakpoint={768} size="220px">
-        <nav class="surface vertical" style={{ "padding": "1rem"}}>
+      <Rail edge="left" responsive breakpoint={768}>
+        <nav class="surface vertical nav" style={{ "padding": "1rem"}}>
           <span>Nav item 1</span>
           <span>Nav item 2</span>
           <span>Nav item 3</span>
@@ -28,8 +28,8 @@ export default function App() {
       </Rail>
 
       {/* Top rail — hides on scroll down, reveals on scroll up */}
-      <Rail edge="top" reveal="scroll-toward" size="60px">
-        <header class="surface horizontal">
+      <Rail edge="top" reveal="scroll-toward">
+        <header class="surface horizontal header">
           <span class="brand">solid-surfaces</span>
           <span class="chip">
             Rail edge="top" reveal="scroll-toward"
@@ -60,8 +60,8 @@ export default function App() {
       </Body>
 
       {/* Bottom drawer — overlay, controlled open state */}
-      <Drawer edge="bottom" open={drawerOpen()} size="200px">
-        <div class="surface">
+      <Drawer edge="bottom" open={drawerOpen()}>
+        <div class="surface drawer">
           <strong>Bottom Drawer</strong>
           <span class="chip" style={{ "margin-left": "0.5rem" }}>
             Drawer edge="bottom"

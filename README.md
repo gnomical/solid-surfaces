@@ -39,17 +39,17 @@ function App() {
 
   return (
     <LayoutRoot>
-      <Rail edge="top" reveal="scroll-toward" size="60px">
-        Top navigation
+      <Rail edge="top" reveal="scroll-toward">
+        <header style={{ height: "60px" }}>Top navigation</header>
       </Rail>
-      <Rail edge="left" responsive size="220px">
-        Sidebar
+      <Rail edge="left" responsive>
+        <nav style={{ width: "220px" }}>Sidebar</nav>
       </Rail>
       <Body>
         Main content
       </Body>
-      <Drawer edge="bottom" open={drawerOpen()} size="200px">
-        Tray content
+      <Drawer edge="bottom" open={drawerOpen()}>
+        <div style={{ height: "200px" }}>Tray content</div>
       </Drawer>
     </LayoutRoot>
   )
@@ -59,7 +59,7 @@ function App() {
 * The sidebar becomes an overlay below the responsive breakpoint
 * The top rail hides as the user scrolls away and reveals as they scroll back
 * The body adjusts based on active surfaces
-* No manual layout math
+* No manual layout math, no size props to keep in sync with CSS
 
 ## Core primitives
 
@@ -87,8 +87,12 @@ Supports three reveal behaviors:
 Rails also support responsive switching: above a configurable `breakpoint` the rail reserves grid space; below it switches to overlay mode.
 
 ```tsx
-<Rail edge="left" responsive breakpoint={768} size="220px" />
+<Rail edge="left" responsive breakpoint={768}>
+  <nav style={{ width: "220px" }}>Sidebar</nav>
+</Rail>
 ```
+
+**Sizing:** Rails measure their content via ResizeObserver and use that to drive the grid track. Size your content element with CSS — no `size` prop required or accepted.
 
 #### Body
 
@@ -99,23 +103,28 @@ The main content area. Automatically adjusts based on which surfaces are active 
 A transient overlay surface, controlled by an `open` prop. Does not affect the grid — it renders above reserved surfaces.
 
 ```tsx
-<Drawer edge="bottom" open={open()} size="200px" />
+<Drawer edge="bottom" open={open()}>
+  <div style={{ height: "200px" }}>Tray content</div>
+</Drawer>
 ```
+
+**Sizing:** Size the content element directly with CSS.
 
 ## How it works
 
 Each surface registers a descriptor with the layout engine:
 
 ```
-edge:      "left" | "right" | "top" | "bottom"
-occupancy: "none" | "reserved" | "visible-driven"
-visibility: "visible" | "hidden"
-reveal:    "always" | "scroll-toward" | "pointer-proximity" | "manual"
-size:      string  // CSS value, e.g. "240px"
-order:     number  // stacking among same-edge surfaces
+edge:         "left" | "right" | "top" | "bottom"
+occupancy:    "none" | "reserved" | "visible-driven"
+visibility:   "visible" | "hidden"
+reveal:       "always" | "scroll-toward" | "pointer-proximity" | "manual"
+actualSize:   string  // measured from content via ResizeObserver
+reservedSize: string  // runtime override during scroll-coupled shrinking
+order:        number  // stacking among same-edge surfaces
 ```
 
-`LayoutRoot` derives CSS grid track sizes reactively from these descriptors. When a surface registers, unregisters, changes occupancy, or changes size (e.g. during scroll-coupled shrinking), the grid updates automatically.
+`LayoutRoot` derives CSS grid track sizes reactively from these descriptors. The grid track for each edge is `reservedSize` when set (e.g. during scroll-toward animation), falling back to `actualSize`. When a surface registers, unregisters, changes occupancy, or its measured size changes, the grid updates automatically.
 
 ## Low-level usage
 
@@ -128,11 +137,10 @@ const handle = createSurface({
   edge: "top",
   occupancy: "visible-driven",
   reveal: "scroll-toward",
-  size: "60px",
 })
 ```
 
-This gives full control over reveal logic and occupancy transitions for custom behaviors.
+This gives full control over reveal logic and occupancy transitions for custom behaviors. Size the associated element via CSS; the library measures it automatically.
 
 ## Design goals
 

@@ -6,7 +6,7 @@ import {
   type JSX,
 } from "solid-js"
 import { useLayout } from "../../context/LayoutContext"
-import { DEFAULT_BREAKPOINT, DEFAULT_RAIL_SIZE, POINTER_PROXIMITY_THRESHOLD } from "../../lib/constants"
+import { DEFAULT_BREAKPOINT, POINTER_PROXIMITY_THRESHOLD } from "../../lib/constants"
 import type { Occupancy, RailProps, SurfaceHandle, Visibility } from "../../lib/types"
 import { Surface } from "../Surface"
 
@@ -14,7 +14,6 @@ import { Surface } from "../Surface"
 export function Rail(props: RailProps) {
   const { updateSurface, scrollContainer } = useLayout()
 
-  const size = () => props.size ?? DEFAULT_RAIL_SIZE
   const reveal = () => props.reveal ?? "always"
   const breakpoint = () => props.breakpoint ?? DEFAULT_BREAKPOINT
   const initialOccupancy: Occupancy = props.occupancy ?? "reserved"
@@ -26,7 +25,6 @@ export function Rail(props: RailProps) {
   const scrollStyle = (): JSX.CSSProperties => props.style ?? {}
 
   let handle!: SurfaceHandle
-  let railEl!: HTMLElement
 
   // Sync occupancy changes back to context
   createEffect(() => {
@@ -53,15 +51,20 @@ export function Rail(props: RailProps) {
   onMount(() => {
     if (reveal() !== "scroll-toward") return
 
-    let railPx = 0
     let attached: HTMLElement | null = null
     let lastScrollPos = 0
     let lastDelta = 0
-    let virtualPos = 0  // tracks header visibility independent of absolute scroll position
+    let virtualPos = 0
     let rafId: number | null = null
 
+    const getRailPx = () => parseFloat(handle.actualSize()) || 0
+
     function commit() {
-      updateSurface(handle.id, { currentSize: `${railPx - virtualPos}px` })
+      // Clear reservedSize when fully visible so the grid tracks actualSize directly,
+      // avoiding a ResizeObserver → reservedSize → resize → ResizeObserver loop.
+      updateSurface(handle.id, {
+        reservedSize: virtualPos > 0 ? `${getRailPx() - virtualPos}px` : undefined,
+      })
     }
 
     function snapTo(target: number) {
@@ -82,11 +85,13 @@ export function Rail(props: RailProps) {
     }
 
     function onScrollEnd() {
+      const railPx = getRailPx()
       if (virtualPos === 0 || virtualPos === railPx) return
       snapTo(lastDelta > 0 ? railPx : 0)
     }
 
     function sync(scrollPos: number, el: HTMLElement) {
+      const railPx = getRailPx()
       const delta = scrollPos - lastScrollPos
       if (delta !== 0) lastDelta = delta
       virtualPos = Math.min(Math.max(0, virtualPos + delta), railPx)
@@ -112,6 +117,13 @@ export function Rail(props: RailProps) {
       sync(scrollPos, this)
     }
 
+    // Re-run commit when actualSize changes during a partial-reveal so reservedSize stays in sync.
+    // Only fires when mid-scroll; at rest (virtualPos === 0) the grid uses actualSize directly.
+    createEffect(() => {
+      void handle.actualSize()
+      if (attached && virtualPos > 0) commit()
+    })
+
     createEffect(() => {
       if (attached) {
         attached.removeEventListener("scroll", onScroll as EventListener)
@@ -121,14 +133,11 @@ export function Rail(props: RailProps) {
       }
       const container = scrollContainer()
       if (container) {
-        railPx = railEl.getBoundingClientRect()[
-          props.edge === "left" || props.edge === "right" ? "width" : "height"
-        ]
         const scrollPos = props.edge === "left" || props.edge === "right"
           ? container.scrollLeft
           : container.scrollTop
         lastScrollPos = scrollPos
-        virtualPos = Math.min(scrollPos, railPx)
+        virtualPos = Math.min(scrollPos, getRailPx())
         commit()
         container.addEventListener("scroll", onScroll as EventListener, { passive: true })
         container.addEventListener("scrollend", onScrollEnd, { passive: true })
@@ -170,12 +179,10 @@ export function Rail(props: RailProps) {
   return (
     <Surface
       ref={(h) => { handle = h }}
-      domRef={(el) => { railEl = el }}
       edge={props.edge}
       overlay={overlayMode() || effectiveOccupancy() === "none"}
       occupancy={effectiveOccupancy()}
       reveal={reveal()}
-      size={size()}
       order={props.order ?? 0}
       zIndex={10}
       surfaceType="rail"

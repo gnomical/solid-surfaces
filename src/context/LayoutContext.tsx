@@ -3,7 +3,6 @@ import {
   createSignal,
   JSX,
   onCleanup,
-  onMount,
   useContext,
 } from "solid-js"
 import type {
@@ -14,6 +13,7 @@ import type {
   SurfaceHandle,
   Visibility,
 } from "../lib/types"
+
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -68,25 +68,29 @@ export function createSurface(options: CreateSurfaceOptions): SurfaceHandle {
     occupancy: options.occupancy ?? "reserved",
     visibility: options.visibility ?? "visible",
     reveal: options.reveal ?? "always",
-    size: options.size ?? "240px",
+    actualSize: "0px",
     order: options.order ?? 0,
   }
 
   let id: string
 
   const [visibility, setVisibilitySignal] = createSignal<Visibility>(descriptor.visibility)
+  const [actualSize, setActualSizeSignal] = createSignal<string>("0px")
 
   function setVisibility(v: Visibility) {
     setVisibilitySignal(v)
     ctx.updateSurface(id, { visibility: v })
   }
 
-  onMount(() => {
-    id = ctx.registerSurface(descriptor)
-    onCleanup(() => ctx.unregisterSurface(id))
-  })
+  function setActualSize(v: string) {
+    setActualSizeSignal(v)
+    ctx.updateSurface(id, { actualSize: v })
+  }
+
+  id = ctx.registerSurface(descriptor)
+  onCleanup(() => ctx.unregisterSurface(id))
 
   const surface = () => ctx.surfaces().find((s) => s.id === id)
 
-  return { get id() { return id }, visibility, setVisibility, surface }
+  return { get id() { return id }, visibility, setVisibility, actualSize, setActualSize, surface }
 }

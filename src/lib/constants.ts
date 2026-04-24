@@ -1,4 +1,2 @@
-export const DEFAULT_RAIL_SIZE = "240px"
-export const DEFAULT_DRAWER_SIZE = "300px"
 export const DEFAULT_BREAKPOINT = 768
 export const POINTER_PROXIMITY_THRESHOLD = 48
