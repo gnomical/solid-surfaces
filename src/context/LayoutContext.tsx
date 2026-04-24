@@ -1,6 +1,7 @@
 import {
   createContext,
   createSignal,
+  JSX,
   onCleanup,
   onMount,
   useContext,
@@ -20,7 +21,7 @@ const LayoutContext = createContext<LayoutContextValue | undefined>(undefined)
 
 let idCounter = 0
 
-export function LayoutProvider(props: { children: any }) {
+export function LayoutProvider(props: { children: JSX.Element }) {
   const [surfaces, setSurfaces] = createSignal<RegisteredSurface[]>([])
   const [scrollContainer, setScrollContainer] = createSignal<HTMLElement | null>(null)
 
