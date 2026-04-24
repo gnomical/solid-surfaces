@@ -46,7 +46,7 @@ button {
 }
 
 button:hover {
-  background: #00000011;
+  background: #6aff00;
 }
 
 .close {
@@ -76,9 +76,10 @@ button:hover {
 
 /* Surface styling — consumers own this */
 .surface {
+  --border-size: 0.2rem;
   height: 100%;
   background: #ffffff;
-  border: 0.2rem dotted #111;
+  border: var(--border-size) solid #111;
   box-sizing: border-box;
   backdrop-filter: blur(7px);
   padding: 0.5rem;
@@ -90,10 +91,12 @@ button:hover {
 .surface.horizontal {
   align-items: center;
   justify-content: space-between;
+  border-width: var(--border-size) 0;
 }
 
 .surface.vertical {
   flex-direction: column;
+  border-width: 0 var(--border-size);
 }
 
 .body-content {

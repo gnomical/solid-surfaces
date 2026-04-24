@@ -17,7 +17,7 @@ export default function App() {
     <LayoutRoot>
       {/* Left rail — reserved on desktop, overlay on mobile */}
       <Rail edge="left" responsive breakpoint={768} size="220px">
-        <nav class="surface vertical" style={{ "padding": "1rem" }}>
+        <nav class="surface vertical" style={{ "padding": "1rem"}}>
           <span>Nav item 1</span>
           <span>Nav item 2</span>
           <span>Nav item 3</span>
