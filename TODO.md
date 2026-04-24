@@ -1,0 +1,1 @@
+- support multiple surfaces assigned to the same edge. if drawers/overlays we need to support stacking order. for rails we need to support attachment order and reservedSize may need to add registered surfaces together or find the greatest of all overlays.
