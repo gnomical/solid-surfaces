@@ -10,12 +10,26 @@ html, body, #root {
 }
 
 body {
-  font-family: system-ui, sans-serif;
-  font-size: 14px;
+  font-family: "Rubik", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 18px;
 }
 
-#root {
-  position: relative;
+h1 {
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.brand {
+  font-weight: 900;
+  font-size: 1.25rem;
+}
+
+p {
+  line-height: 1.6;
+  color: #444;
 }
 
 button {
@@ -43,19 +57,28 @@ button:hover {
 
 .chip {
   display: inline-block;
-  background: #333;
   color: #fff;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  background: #8800ff;
+  padding: 0.2rem 1rem;
   font-size: 0.75rem;
   font-family: monospace;
+  --p: 1em; /* control the shape */
+  clip-path: polygon(var(--p) 0,100% 0,calc(100% - var(--p)) 100%,0 100%);
+  &:before {
+    content: "<";
+    margin-right: 0.25rem;
+  }
+  &:after {
+    content: "/>";
+    margin-left: 0.25rem;
+  }
 }
 
 /* Surface styling — consumers own this */
 .surface {
   height: 100%;
-  background: #ffffff77;
-  border: 0.5rem solid lightblue;
+  background: #ffffff;
+  border: 0.2rem dotted #111;
   box-sizing: border-box;
   backdrop-filter: blur(7px);
   padding: 0.5rem;
@@ -78,15 +101,10 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
-.body-content h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
 
-.body-content p {
-  line-height: 1.6;
-  color: #444;
-  max-width: 60ch;
-}

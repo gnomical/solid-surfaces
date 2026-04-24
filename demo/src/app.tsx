@@ -17,9 +17,7 @@ export default function App() {
     <LayoutRoot>
       {/* Left rail — reserved on desktop, overlay on mobile */}
       <Rail edge="left" responsive breakpoint={768} size="220px">
-        <nav class="surface vertical" style={{ "border-color": "green" }}>
-          <strong>solid-surfaces</strong>
-          <hr style={{ "border-color": "#333", margin: "0.25rem 0" }} />
+        <nav class="surface vertical" style={{ "padding": "1rem" }}>
           <span>Nav item 1</span>
           <span>Nav item 2</span>
           <span>Nav item 3</span>
@@ -31,8 +29,11 @@ export default function App() {
 
       {/* Top rail — hides on scroll down, reveals on scroll up */}
       <Rail edge="top" reveal="scroll-toward" size="60px">
-        <header class="surface horizontal" style={{ "border-color": "pink" }}>
-          <span>Top Rail — reveal: scroll-toward</span>
+        <header class="surface horizontal">
+          <span class="brand">solid-surfaces</span>
+          <span class="chip">
+            Rail edge="top" reveal="scroll-toward"
+          </span>
           <button onClick={() => setDrawerOpen((v) => !v)} style="transform: rotate(-90deg)">
             {drawerOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
           </button>
