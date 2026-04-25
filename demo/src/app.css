@@ -66,11 +66,21 @@ button:hover {
   clip-path: polygon(var(--p) 0,100% 0,calc(100% - var(--p)) 100%,0 100%);
   &:before {
     content: "<";
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
   }
   &:after {
     content: "/>";
-    margin-left: 0.25rem;
+    margin-inline-start: 0.25rem;
+  }
+
+  &.vertical {
+    writing-mode: sideways-rl;
+    padding: 1rem 0.2rem;
+    clip-path: polygon(0 0,100% var(--p),100% 100%,0 calc(100% - var(--p)));
+  }
+  &.sm {
+    font-size: 0.6rem;
+    --p: 0.5em;
   }
 }
 
@@ -127,6 +137,42 @@ button:hover {
   height: calc(100% + var(--border-size));
   transform: translateY(calc(-1 * var(--border-size)));
   border-right: var(--border);
+  padding: 1rem;
+}
+
+.icon-bar {
+  width: 52px;
+  align-items: center;
+  padding: 0.75rem 0.5rem !important;
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  width: 2rem;
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f5f5f5;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.controls select {
+  font-size: 0.85rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ccc;
 }
 
 .body-content {

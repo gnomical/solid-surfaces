@@ -1,5 +1,6 @@
 import {
   createContext,
+  createMemo,
   createSignal,
   JSX,
   onCleanup,
@@ -7,6 +8,7 @@ import {
 } from "solid-js"
 import type {
   CreateSurfaceOptions,
+  GridStructure,
   LayoutContextValue,
   RegisteredSurface,
   SurfaceDescriptor,
@@ -25,6 +27,20 @@ export function LayoutProvider(props: { children: JSX.Element }) {
   const [surfaces, setSurfaces] = createSignal<RegisteredSurface[]>([])
   const [scrollContainer, setScrollContainer] = createSignal<HTMLElement | null>(null)
 
+  const gridStructure = createMemo<GridStructure>(() => {
+    const active = surfaces().filter(
+      (s) => s.occupancy === "reserved" || s.occupancy === "visible-driven"
+    )
+    const count = (edge: RegisteredSurface["edge"]) =>
+      active.filter((s) => s.edge === edge).length
+    return {
+      topCount: count("top"),
+      bottomCount: count("bottom"),
+      leftCount: count("left"),
+      rightCount: count("right"),
+    }
+  })
+
   function registerSurface(descriptor: SurfaceDescriptor): string {
     const id = `ss-surface-${++idCounter}`
     setSurfaces((prev) => [...prev, { ...descriptor, id }])
@@ -42,7 +58,7 @@ export function LayoutProvider(props: { children: JSX.Element }) {
   }
 
   return (
-    <LayoutContext.Provider value={{ surfaces, registerSurface, unregisterSurface, updateSurface, scrollContainer, setScrollContainer }}>
+    <LayoutContext.Provider value={{ surfaces, registerSurface, unregisterSurface, updateSurface, scrollContainer, setScrollContainer, gridStructure }}>
       {props.children}
     </LayoutContext.Provider>
   )
@@ -70,6 +86,7 @@ export function createSurface(options: CreateSurfaceOptions): SurfaceHandle {
     reveal: options.reveal ?? "always",
     actualSize: "0px",
     order: options.order ?? 0,
+    span: options.span,
   }
 
   let id: string

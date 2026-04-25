@@ -2,6 +2,5 @@
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-areas: "top top top" "left main right" "bottom bottom bottom";
   overflow: hidden;
 }

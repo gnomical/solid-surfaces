@@ -1,15 +1,18 @@
 import { createEffect, onCleanup, onMount, JSX } from "solid-js"
-import { createSurface } from "../../context/LayoutContext"
+import { createSurface, useLayout } from "../../context/LayoutContext"
 import type { SurfaceProps } from "../../lib/types"
 import styles from "./Surface.module.css"
 
 export function Surface(props: SurfaceProps) {
+  const { gridStructure } = useLayout()
+
   const handle = createSurface({
     edge: props.edge,
     occupancy: props.occupancy ?? (props.overlay ? "none" : "reserved"),
     reveal: props.reveal ?? "always",
     visibility: props.visibility ?? "visible",
     order: props.order ?? 0,
+    span: props.span,
   })
 
   // Deliver handle synchronously so callers can wire effects against it
@@ -22,12 +25,32 @@ export function Surface(props: SurfaceProps) {
 
   const isHidden = () => handle.visibility() === "hidden"
 
-  const inlineStyle = (): JSX.CSSProperties => ({
-    ...(props.overlay
-      ? { "z-index": props.zIndex ?? 10 }
-      : { "grid-area": props.edge }),
-    ...props.style,
-  })
+  const inlineStyle = (): JSX.CSSProperties => {
+    if (props.overlay) {
+      const span = props.span ?? "full"
+      const gs = gridStructure()
+      // Grid placement constrains the absolute-positioned overlay's containing block.
+      // "full" covers all tracks; "inset" excludes crossing-axis rail tracks.
+      const gridRow =
+        span === "inset" && (props.edge === "left" || props.edge === "right")
+          ? `${gs.topCount + 1} / ${gs.topCount + 2}`
+          : `1 / -1`
+      const gridCol =
+        span === "inset" && (props.edge === "top" || props.edge === "bottom")
+          ? `${gs.leftCount + 1} / ${gs.leftCount + 2}`
+          : `1 / -1`
+      return {
+        "z-index": props.zIndex ?? 10,
+        "grid-row": gridRow,
+        "grid-column": gridCol,
+        ...props.style,
+      }
+    }
+    return {
+      "grid-area": `ss-${props.edge}-${props.order ?? 0}`,
+      ...props.style,
+    }
+  }
 
   let surfaceEl!: HTMLElement
 

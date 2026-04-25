@@ -10,6 +10,7 @@ export function Overlay(props: OverlayProps) {
       reveal="manual"
       visibility={props.open ? "visible" : "hidden"}
       order={props.order ?? 0}
+      span={props.span}
       zIndex={20}
       surfaceType="overlay"
       class={props.class}

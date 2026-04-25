@@ -184,6 +184,7 @@ export function Rail(props: RailProps) {
       occupancy={effectiveOccupancy()}
       reveal={reveal()}
       order={props.order ?? 0}
+      span={props.span}
       zIndex={10}
       surfaceType="rail"
       class={props.class}
