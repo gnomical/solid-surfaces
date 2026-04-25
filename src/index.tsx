@@ -2,7 +2,7 @@ export { LayoutRoot } from "./components/LayoutRoot"
 export { Body } from "./components/Body"
 export { Surface } from "./components/Surface"
 export { Rail } from "./components/Rail"
-export { Drawer } from "./components/Drawer"
+export { Overlay } from "./components/Overlay"
 export { createSurface, useLayout } from "./context/LayoutContext"
 
 export type {
@@ -19,5 +19,5 @@ export type {
   BodyProps,
   SurfaceProps,
   RailProps,
-  DrawerProps,
+  OverlayProps,
 } from "./lib/types"

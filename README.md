@@ -29,13 +29,15 @@ A surface is something that:
 * can appear, disappear, or reveal based on interaction
 * participates in a shared layout
 
+The two main primitives are **Rail** and **Overlay**. Both can slide on and off screen relative to the edge they are attached to — the difference is whether they occupy the grid. A Rail reserves space and pushes the body; an Overlay floats above the layout without affecting it.
+
 ### Quick example
 
 ```tsx
-import { LayoutRoot, Rail, Body, Drawer } from "solid-surfaces"
+import { LayoutRoot, Rail, Body, Overlay } from "solid-surfaces"
 
 function App() {
-  const [drawerOpen, setDrawerOpen] = createSignal(false)
+  const [overlayOpen, setOverlayOpen] = createSignal(false)
 
   return (
     <LayoutRoot>
@@ -48,9 +50,9 @@ function App() {
       <Body>
         Main content
       </Body>
-      <Drawer edge="bottom" open={drawerOpen()}>
+      <Overlay edge="bottom" open={overlayOpen()}>
         <div style={{ height: "200px" }}>Tray content</div>
-      </Drawer>
+      </Overlay>
     </LayoutRoot>
   )
 }
@@ -69,7 +71,7 @@ The layout engine. Wraps all surfaces and the body, computes CSS grid geometry r
 
 #### Rail
 
-A persistent edge-attached panel.
+A persistent edge-attached panel that reserves space in the grid.
 
 ```tsx
 <Rail edge="left" />
@@ -98,14 +100,14 @@ Rails also support responsive switching: above a configurable `breakpoint` the r
 
 The main content area. Automatically adjusts based on which surfaces are active and how much space they reserve.
 
-#### Drawer
+#### Overlay
 
-A transient overlay surface, controlled by an `open` prop. Does not affect the grid — it renders above reserved surfaces.
+A transient surface that floats above the layout, controlled by an `open` prop. Does not affect the grid — it renders above reserved surfaces.
 
 ```tsx
-<Drawer edge="bottom" open={open()}>
+<Overlay edge="bottom" open={open()}>
   <div style={{ height: "200px" }}>Tray content</div>
-</Drawer>
+</Overlay>
 ```
 
 **Sizing:** Size the content element directly with CSS.
@@ -159,7 +161,7 @@ Currently exploring core concepts. Not ready for production use.
 
 - [x] Layout engine (LayoutRoot + LayoutContext)
 - [x] Rail primitive with scroll-toward, pointer-proximity, and responsive behaviors
-- [x] Drawer primitive
+- [x] Overlay primitive
 - [x] Body primitive
 - [x] Low-level `createSurface` escape hatch
 - [ ] Dedicated Header primitive

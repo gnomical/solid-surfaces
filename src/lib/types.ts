@@ -88,7 +88,7 @@ export type RailProps = {
   style?: JSX.CSSProperties
 }
 
-export type DrawerProps = {
+export type OverlayProps = {
   edge: Edge
   open: boolean
   children?: JSX.Element

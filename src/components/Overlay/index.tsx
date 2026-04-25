@@ -1,7 +1,7 @@
-import type { DrawerProps } from "../../lib/types"
+import type { OverlayProps } from "../../lib/types"
 import { Surface } from "../Surface"
 
-export function Drawer(props: DrawerProps) {
+export function Overlay(props: OverlayProps) {
   return (
     <Surface
       edge={props.edge}
@@ -11,7 +11,7 @@ export function Drawer(props: DrawerProps) {
       visibility={props.open ? "visible" : "hidden"}
       order={props.order ?? 0}
       zIndex={20}
-      surfaceType="drawer"
+      surfaceType="overlay"
       class={props.class}
       style={props.style}
     >

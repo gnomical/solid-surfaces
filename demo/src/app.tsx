@@ -1,5 +1,5 @@
 import { createSignal, For } from "solid-js"
-import { LayoutRoot, Rail, Drawer, Body } from "solid-surfaces"
+import { LayoutRoot, Rail, Overlay, Body } from "solid-surfaces"
 import "./app.css"
 import { CLOSE_ICON, SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
 
@@ -11,7 +11,7 @@ dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
 sunt in culpa qui officia deserunt mollit anim id est laborum.`
 
 export default function App() {
-  const [drawerOpen, setDrawerOpen] = createSignal(false)
+  const [overlayOpen, setOverlayOpen] = createSignal(false)
 
   return (
     <LayoutRoot class="root">
@@ -34,8 +34,8 @@ export default function App() {
           <span class="chip">
             Rail edge="top" reveal="scroll-toward"
           </span>
-          <button onClick={() => setDrawerOpen((v) => !v)} style="transform: rotate(-90deg)">
-            {drawerOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
+          <button onClick={() => setOverlayOpen((v) => !v)} style="transform: rotate(-90deg)">
+            {overlayOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
           </button>
         </header>
       </Rail>
@@ -47,7 +47,7 @@ export default function App() {
           <p>
             Resize the window below 768px to see the left Rail collapse to
             overlay mode. Scroll down to hide the top Rail, then scroll up to
-            reveal it. Use the button above to toggle the bottom Drawer.
+            reveal it. Use the button above to toggle the bottom Overlay.
           </p>
           <For each={Array.from({ length: 20 })}>
             {(_, i) => (
@@ -59,21 +59,21 @@ export default function App() {
         </div>
       </Body>
 
-      {/* Bottom drawer — overlay, controlled open state */}
-      <Drawer edge="bottom" open={drawerOpen()}>
+      {/* Bottom overlay — controlled open state */}
+      <Overlay edge="bottom" open={overlayOpen()}>
         <div class="surface drawer">
-          <strong>Bottom Drawer</strong>
+          <strong>Bottom Overlay</strong>
           <span class="chip" style={{ "margin-left": "0.5rem" }}>
-            Drawer edge="bottom"
+            Overlay edge="bottom"
           </span>
           <p style={{ "margin-top": "0.5rem" }}>
             This is an overlay surface. It does not affect the grid layout.
           </p>
-          <button onClick={() => setDrawerOpen(false)} class="close">  
+          <button onClick={() => setOverlayOpen(false)} class="close">
             {CLOSE_ICON()}
           </button>
         </div>
-      </Drawer>
+      </Overlay>
     </LayoutRoot>
   )
 }

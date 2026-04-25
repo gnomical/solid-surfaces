@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "build": "vite build && tsc",
+    "dev": "pnpm run build && cd demo && pnpm run setup && pnpm run dev",
     "prepublishOnly": "npm run build",
     "prettier": "npx prettier --write ."
   },
