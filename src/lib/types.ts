@@ -13,10 +13,10 @@ export type Span = "full" | "inset"
 export type AxisPriority = "horizontal" | "vertical"
 
 export type CornerOwners = {
-  topLeft?: { edge: Edge; order?: number }
-  topRight?: { edge: Edge; order?: number }
-  bottomLeft?: { edge: Edge; order?: number }
-  bottomRight?: { edge: Edge; order?: number }
+  topLeft?: { edge: Edge }
+  topRight?: { edge: Edge }
+  bottomLeft?: { edge: Edge }
+  bottomRight?: { edge: Edge }
 }
 
 // ─── Surface descriptor ───────────────────────────────────────────────────────

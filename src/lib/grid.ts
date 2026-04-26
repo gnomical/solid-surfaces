@@ -30,7 +30,7 @@ export function resolveCorner(
   hSurface: RegisteredSurface | undefined,
   vSurface: RegisteredSurface | undefined,
   axisPriority: AxisPriority | undefined,
-  cornerOverride: { edge: Edge; order?: number } | undefined
+  cornerOverride: { edge: Edge } | undefined
 ): Edge {
   if (cornerOverride) return cornerOverride.edge
 
