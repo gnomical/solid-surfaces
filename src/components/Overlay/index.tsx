@@ -1,4 +1,4 @@
-import type { OverlayProps } from "../../lib/types"
+import type { OverlayProps } from "../../lib/solid-types"
 import { Surface } from "../Surface"
 
 export function Overlay(props: OverlayProps) {

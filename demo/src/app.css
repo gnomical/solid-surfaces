@@ -1,8 +1,17 @@
 :root {
+  /* Dark Theme */
   --stp-foreground: #f3f3f3;
   --stp-background: #111;
   --stp-background-alpha-secondary: #111111aa;
   --stp-accent: hsl(272, 100%, 25%);
+  color-scheme: dark;
+
+  /* Light Theme */
+  /* --stp-foreground: #111;
+  --stp-background: #fff;
+  --stp-background-alpha-secondary: #ffffffaa;
+  --stp-accent: hsl(272, 100%, 50%);
+  color-scheme: light; */
 }
 
 /* Demo shell */
@@ -69,8 +78,8 @@ button:hover {
 /* Surface styling — consumers own this */
 .root {
   inset: 8px;
-  border-radius: 20px;
-  --border-size: 0.2rem;
+  border-radius: 5px;
+  --border-size: 3px;
   /* --stp-foreground: #111; */
   --border: var(--border-size) solid var(--stp-foreground);
   border: var(--border);

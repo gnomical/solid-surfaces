@@ -1,6 +1,6 @@
 import { createEffect, onCleanup, onMount, JSX } from "solid-js"
 import { createSurface, useLayout } from "../../context/LayoutContext"
-import type { SurfaceProps } from "../../lib/types"
+import type { SurfaceProps } from "../../lib/solid-types"
 import styles from "./Surface.module.css"
 
 export function Surface(props: SurfaceProps) {

@@ -171,6 +171,6 @@ Currently exploring core concepts. Not ready for production use.
 
 ## Contributing
 
-Contributions are welcome.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for codebase architecture, key contracts between layers, and how to run the demo.
 
 By contributing, you agree that your contributions will be licensed under the Apache License 2.0.
