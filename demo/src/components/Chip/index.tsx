@@ -22,7 +22,7 @@ export function Chip(props: {
       [styles.chip]: true,
       [styles.vertical]: props.vertical,
     }}>
-      <span class={styles.value}>{props.type}</span>
+      <span class={styles.type}>{props.type}</span>
       {tokens().map(([k, v, isNum]) => (
         <>
           <span class={styles.dot}>·</span>

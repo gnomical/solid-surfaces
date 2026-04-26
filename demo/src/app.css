@@ -1,3 +1,10 @@
+:root {
+  --stp-foreground: #f3f3f3;
+  --stp-background: #111;
+  --stp-background-alpha-secondary: #111111aa;
+  --stp-accent: hsl(272, 100%, 25%);
+}
+
 /* Demo shell */
 * {
   box-sizing: border-box;
@@ -15,6 +22,8 @@ body {
   font-weight: 400;
   font-style: normal;
   font-size: 18px;
+  color: var(--stp-foreground);
+  background: var(--stp-background);
 }
 
 h1 {
@@ -29,7 +38,7 @@ h1 {
 
 p {
   line-height: 1.6;
-  color: #444;
+  /* color: #444; */
 }
 
 button {
@@ -60,15 +69,15 @@ button:hover {
   inset: 8px;
   border-radius: 20px;
   --border-size: 0.2rem;
-  --stp-foreground: #111;
+  /* --stp-foreground: #111; */
   --border: var(--border-size) solid var(--stp-foreground);
   border: var(--border);
 }
 
 .surface {
   height: 100%;
-  background: #ffffffaa;
-  /* border: var(--border-size) solid #111; */
+  background: var(--stp-background-alpha-secondary);
+  /* border: var(--border-size) solid var(--stp-foreground); */
   box-sizing: border-box;
   backdrop-filter: blur(12px);
   padding: 0.5rem;
@@ -128,8 +137,9 @@ button:hover {
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: #f5f5f5;
-  border-radius: 0.5rem;
+  border: var(--border);
+  /* background: #f5f5f5; */
+  /* border-radius: 0.5rem; */
   font-size: 0.85rem;
 }
 
