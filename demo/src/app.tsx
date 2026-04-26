@@ -3,6 +3,7 @@ import { LayoutRoot, Rail, Overlay, Body } from "solid-surfaces"
 import type { AxisPriority } from "solid-surfaces"
 import "./app.css"
 import { CLOSE_ICON, SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
+import { Chip } from "./components/Chip"
 
 const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -22,9 +23,7 @@ export default function App() {
       <Rail edge="top" reveal="scroll-toward" span="full">
         <header class="surface horizontal header">
           <span class="brand">solid-surfaces</span>
-          <span class="chip">
-            Rail edge="top" span="full" reveal="scroll-toward" 
-          </span>
+          <Chip type="Rail" edge="top" reveal="scroll-toward" />
           <button onClick={() => setOverlayOpen((v) => !v)} style="transform: rotate(-90deg)">
             {overlayOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
           </button>
@@ -38,7 +37,7 @@ export default function App() {
           <span class="nav-icon">⊟</span>
           <span class="nav-icon">⊠</span>
           <div style={{ "margin-top": "auto", "width": "1.2em" }}>
-            <span class="chip vertical">Rail edge="left" order="0"</span>
+            <Chip vertical type="Rail" edge="left" order={0} />
           </div>
         </nav>
       </Rail>
@@ -50,8 +49,7 @@ export default function App() {
           <span>Nav item 2</span>
           <span>Nav item 3</span>
           <div style={{ "margin-top": "auto"}}>
-            {/* <span class="chip">Rail<br/>&nbsp;&nbsp;edge="left"<br/>&nbsp;&nbsp;order="1"<br/>&nbsp;&nbsp;breakpoint="768"<br/></span> */}
-            <span class="chip vertical">Rail edge="left" order="1" breakpoint="768"</span>
+            <Chip vertical type="Rail" edge="left" order={1} breakpoint={768} />
           </div>
         </nav>
       </Rail>
@@ -59,7 +57,7 @@ export default function App() {
       {/* Body */}
       <Body>
         <div class="body-content">
-          <h1>solid-surfaces Demo</h1>
+          <h1>Solid-Surfaces Demo</h1>
 
           <div class="controls">
             <label>
@@ -105,10 +103,7 @@ export default function App() {
       {/* Bottom overlay — demonstrates span="inset" vs span="full" */}
       <Overlay edge="bottom" open={overlayOpen()} span={overlaySpanInset() ? "inset" : "full"}>
         <div class="surface drawer">
-          <strong>Bottom Overlay</strong>
-          <span class="chip" style={{ "margin-left": "0.5rem" }}>
-            Overlay edge="bottom" span="{overlaySpanInset() ? "inset" : "full"}"
-          </span>
+          <Chip type="Overlay" edge="bottom" span={overlaySpanInset() ? "inset" : "full"} />
           <p style={{ "margin-top": "0.5rem" }}>
             {overlaySpanInset()
               ? "span=\"inset\": bounded by the left rail column tracks."

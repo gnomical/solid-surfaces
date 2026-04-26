@@ -9,6 +9,7 @@
     "build:local": "cd .. && pnpm build && cd demo && pnpm run setup && pnpm run build"
   },
   "dependencies": {
+    "shiki": "^4.0.2",
     "solid-js": "^1.9.12",
     "solid-surfaces": "file:..",
     "vite": "^7.3.2"

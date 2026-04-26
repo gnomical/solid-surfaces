@@ -55,35 +55,6 @@ button:hover {
   right: 0.5rem;
 }
 
-.chip {
-  display: inline-block;
-  color: #fff;
-  background: #8800ff;
-  padding: 0.2rem 1rem;
-  font-size: 0.75rem;
-  font-family: monospace;
-  --p: 1em; /* control the shape */
-  clip-path: polygon(var(--p) 0,100% 0,calc(100% - var(--p)) 100%,0 100%);
-  &:before {
-    content: "<";
-    margin-inline-end: 0.25rem;
-  }
-  &:after {
-    content: "/>";
-    margin-inline-start: 0.25rem;
-  }
-
-  &.vertical {
-    writing-mode: sideways-rl;
-    padding: 1rem 0.2rem;
-    clip-path: polygon(0 0,100% var(--p),100% 100%,0 calc(100% - var(--p)));
-  }
-  &.sm {
-    font-size: 0.6rem;
-    --p: 0.5em;
-  }
-}
-
 /* Surface styling — consumers own this */
 .root {
   inset: 8px;
