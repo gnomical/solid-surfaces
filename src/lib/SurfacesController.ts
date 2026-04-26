@@ -1,3 +1,4 @@
+import { isReservedActive } from "./grid"
 import type {
   GridStructure,
   RegisteredSurface,
@@ -29,9 +30,7 @@ export class SurfacesController {
   }
 
   getGridStructure(): GridStructure {
-    const active = this._surfaces.filter(
-      (s) => s.occupancy === "reserved" || s.occupancy === "visible-driven"
-    )
+    const active = this._surfaces.filter(isReservedActive)
     const count = (edge: RegisteredSurface["edge"]) =>
       active.filter((s) => s.edge === edge).length
     return {

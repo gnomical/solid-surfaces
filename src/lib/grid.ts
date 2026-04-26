@@ -6,6 +6,14 @@ import type {
   Span,
 } from "./types"
 
+/** Returns true for surfaces that occupy a reserved grid track. Shared by buildGridLayout and getGridStructure. */
+export function isReservedActive(s: RegisteredSurface): boolean {
+  return (
+    (s.occupancy === "reserved" || s.occupancy === "visible-driven") &&
+    !(s.occupancy === "visible-driven" && s.visibility === "hidden")
+  )
+}
+
 export function trackSize(surface: RegisteredSurface | undefined): string {
   if (!surface) return "0px"
   if (surface.occupancy === "visible-driven" && surface.visibility === "hidden") return "0px"
@@ -50,12 +58,7 @@ export function buildGridLayout(
 ): { areas: string; columns: string; rows: string } {
   const reserved = (edge: Edge) =>
     surfaces
-      .filter(
-        (s) =>
-          s.edge === edge &&
-          (s.occupancy === "reserved" || s.occupancy === "visible-driven") &&
-          !(s.occupancy === "visible-driven" && s.visibility === "hidden")
-      )
+      .filter((s) => s.edge === edge && isReservedActive(s))
       .sort((a, b) => a.order - b.order)
 
   const leftSurfaces = reserved("left")
