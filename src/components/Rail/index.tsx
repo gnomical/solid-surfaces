@@ -25,6 +25,7 @@ export function Rail(props: RailProps) {
   const scrollStyle = (): JSX.CSSProperties => props.style ?? {}
 
   let handle!: SurfaceHandle
+  let surfaceEl!: HTMLElement
 
   // Sync occupancy changes back to context
   createEffect(() => {
@@ -59,12 +60,24 @@ export function Rail(props: RailProps) {
 
     const getRailPx = () => parseFloat(handle.actualSize()) || 0
 
+    const translateAxis = props.edge === "left" || props.edge === "right" ? "X" : "Y"
+    const translateSign = props.edge === "left" || props.edge === "top" ? -1 : 1
+
+    function applyChildTransform() {
+      const child = surfaceEl?.firstElementChild as HTMLElement | null
+      if (!child) return
+      child.style.transform = virtualPos > 0
+        ? `translate${translateAxis}(${translateSign * virtualPos}px)`
+        : ""
+    }
+
     function commit() {
       // Clear reservedSize when fully visible so the grid tracks actualSize directly,
       // avoiding a ResizeObserver → reservedSize → resize → ResizeObserver loop.
       updateSurface(handle.id, {
         reservedSize: virtualPos > 0 ? `${getRailPx() - virtualPos}px` : undefined,
       })
+      applyChildTransform()
     }
 
     function snapTo(target: number) {
@@ -179,6 +192,7 @@ export function Rail(props: RailProps) {
   return (
     <Surface
       ref={(h) => { handle = h }}
+      domRef={(el) => { surfaceEl = el }}
       edge={props.edge}
       overlay={overlayMode() || effectiveOccupancy() === "none"}
       occupancy={effectiveOccupancy()}

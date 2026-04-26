@@ -24,6 +24,8 @@ body {
   font-size: 18px;
   color: var(--stp-foreground);
   background: var(--stp-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1 {
@@ -76,7 +78,7 @@ button:hover {
 
 .surface {
   height: 100%;
-  background: var(--stp-background-alpha-secondary);
+  background: var(--stp-background);
   /* border: var(--border-size) solid var(--stp-foreground); */
   box-sizing: border-box;
   backdrop-filter: blur(12px);
@@ -103,6 +105,7 @@ button:hover {
   border: var(--border);
   border-radius: 1rem;
   margin: 0 1rem 1rem;
+  background: var(--stp-background-alpha-secondary);
 }
 
 .header {
