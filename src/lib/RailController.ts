@@ -39,11 +39,7 @@ export class RailController {
   disconnect(): void {
     for (const fn of this.cleanups) fn()
     this.cleanups = []
-    if (this.attached) {
-      this.attached.removeEventListener("scroll", this.onScroll as EventListener)
-      this.attached.removeEventListener("scrollend", this.onScrollEnd)
-      this.attached = null
-    }
+    this.detachScroll()
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId)
       this.rafId = null
@@ -146,12 +142,6 @@ export class RailController {
     else if (atBottom) this.virtualPos = railPx
 
     this.commit()
-  }
-
-  private onScroll = function (this: RailController & HTMLElement): void {
-    // 'this' is the scroll container when called as an event listener,
-    // but we bind it to the controller; the container is passed via closure.
-    // Instead we use an arrow wrapper below.
   }
 
   private makeScrollHandler(container: HTMLElement) {
