@@ -1,7 +1,7 @@
 import { onCleanup, onMount } from "solid-js"
 import { useLayout } from "../../context/LayoutContext"
 import styles from "./Body.module.css"
-import type { BodyProps } from "../../lib/types"
+import type { BodyProps } from "../../lib/solid-types"
 
 export function Body(props: BodyProps) {
   const { setScrollContainer } = useLayout()

@@ -6,8 +6,10 @@ import {
   type JSX,
 } from "solid-js"
 import { useLayout } from "../../context/LayoutContext"
-import { DEFAULT_BREAKPOINT, POINTER_PROXIMITY_THRESHOLD } from "../../lib/constants"
-import type { Occupancy, RailProps, SurfaceHandle, Visibility } from "../../lib/types"
+import { DEFAULT_BREAKPOINT } from "../../lib/constants"
+import { RailController } from "../../lib/RailController"
+import type { Occupancy } from "../../lib/types"
+import type { RailProps, SurfaceHandle } from "../../lib/solid-types"
 import { Surface } from "../Surface"
 
 
@@ -16,186 +18,60 @@ export function Rail(props: RailProps) {
 
   const reveal = () => props.reveal ?? "always"
   const breakpoint = () => props.breakpoint ?? DEFAULT_BREAKPOINT
-  const initialOccupancy: Occupancy = props.occupancy ?? "reserved"
 
-  const [overlayMode, setOverlayMode] = createSignal(false)
-  const effectiveOccupancy = (): Occupancy =>
-    overlayMode() ? "none" : initialOccupancy
+  const [occupancy, setOccupancy] = createSignal<Occupancy>(props.occupancy ?? "reserved")
+  const overlayMode = () => occupancy() === "none"
 
   const scrollStyle = (): JSX.CSSProperties => props.style ?? {}
 
   let handle!: SurfaceHandle
   let surfaceEl!: HTMLElement
+  let ctrl: RailController
 
   // Sync occupancy changes back to context
   createEffect(() => {
-    if (handle) updateSurface(handle.id, { occupancy: effectiveOccupancy() })
+    if (handle) updateSurface(handle.id, { occupancy: occupancy() })
   })
 
-  // ── Responsive breakpoint ────────────────────────────────────────────────────
   onMount(() => {
-    if (!props.responsive) return
+    ctrl = new RailController({
+      edge: props.edge,
+      reveal: reveal(),
+      responsive: props.responsive ?? false,
+      breakpoint: breakpoint(),
+      getScrollContainer: () => scrollContainer(),
+      getActualSize: () => parseFloat(handle.actualSize()) || 0,
+      onVisibilityChange: (v) => {
+        handle.setVisibility(v)
+      },
+      onReservedSizeChange: (size) => updateSurface(handle.id, { reservedSize: size }),
+      onOccupancyChange: setOccupancy,
+    })
 
-    const mq = window.matchMedia(`(max-width: ${breakpoint() - 1}px)`)
-    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
-      setOverlayMode(e.matches)
-      if (handle) handle.setVisibility(e.matches ? "hidden" : "visible")
-    }
-    handler(mq)
-    mq.addEventListener("change", handler as (e: MediaQueryListEvent) => void)
-    onCleanup(() =>
-      mq.removeEventListener("change", handler as (e: MediaQueryListEvent) => void)
-    )
+    ctrl.connect(surfaceEl)
+    onCleanup(() => ctrl.disconnect())
   })
 
-  // ── Reveal: scroll-toward ────────────────────────────────────────────────────
-  onMount(() => {
-    if (reveal() !== "scroll-toward") return
-
-    let attached: HTMLElement | null = null
-    let lastScrollPos = 0
-    let lastDelta = 0
-    let virtualPos = 0
-    let rafId: number | null = null
-
-    const getRailPx = () => parseFloat(handle.actualSize()) || 0
-
-    const translateAxis = props.edge === "left" || props.edge === "right" ? "X" : "Y"
-    const translateSign = props.edge === "left" || props.edge === "top" ? -1 : 1
-
-    function applyChildTransform() {
-      const child = surfaceEl?.firstElementChild as HTMLElement | null
-      if (!child) return
-      child.style.transform = virtualPos > 0
-        ? `translate${translateAxis}(${translateSign * virtualPos}px)`
-        : ""
-    }
-
-    function commit() {
-      // Clear reservedSize when fully visible so the grid tracks actualSize directly,
-      // avoiding a ResizeObserver → reservedSize → resize → ResizeObserver loop.
-      updateSurface(handle.id, {
-        reservedSize: virtualPos > 0 ? `${getRailPx() - virtualPos}px` : undefined,
-      })
-      applyChildTransform()
-    }
-
-    function snapTo(target: number) {
-      if (rafId !== null) cancelAnimationFrame(rafId)
-      function step() {
-        const diff = target - virtualPos
-        if (Math.abs(diff) <= 1) {
-          virtualPos = target
-          commit()
-          rafId = null
-          return
-        }
-        virtualPos += diff * 0.2
-        commit()
-        rafId = requestAnimationFrame(step)
-      }
-      rafId = requestAnimationFrame(step)
-    }
-
-    function onScrollEnd() {
-      const railPx = getRailPx()
-      if (virtualPos === 0 || virtualPos === railPx) return
-      snapTo(lastDelta > 0 ? railPx : 0)
-    }
-
-    function sync(scrollPos: number, el: HTMLElement) {
-      const railPx = getRailPx()
-      const delta = scrollPos - lastScrollPos
-      if (delta !== 0) lastDelta = delta
-      virtualPos = Math.min(Math.max(0, virtualPos + delta), railPx)
-      lastScrollPos = scrollPos
-
-      const horizontal = props.edge === "left" || props.edge === "right"
-      const atTop = scrollPos <= 0
-      const atBottom = horizontal
-        ? scrollPos >= el.scrollWidth - el.clientWidth - 1
-        : scrollPos >= el.scrollHeight - el.clientHeight - 1
-
-      if (atTop) virtualPos = 0
-      else if (atBottom) virtualPos = railPx
-
-      commit()
-    }
-
-    function onScroll(this: HTMLElement) {
-      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null }
-      const scrollPos = props.edge === "left" || props.edge === "right"
-        ? this.scrollLeft
-        : this.scrollTop
-      sync(scrollPos, this)
-    }
-
-    // Re-run commit when actualSize changes during a partial-reveal so reservedSize stays in sync.
-    // Only fires when mid-scroll; at rest (virtualPos === 0) the grid uses actualSize directly.
-    createEffect(() => {
-      void handle.actualSize()
-      if (attached && virtualPos > 0) commit()
-    })
-
-    createEffect(() => {
-      if (attached) {
-        attached.removeEventListener("scroll", onScroll as EventListener)
-        attached.removeEventListener("scrollend", onScrollEnd)
-        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null }
-        attached = null
-      }
-      const container = scrollContainer()
-      if (container) {
-        const scrollPos = props.edge === "left" || props.edge === "right"
-          ? container.scrollLeft
-          : container.scrollTop
-        lastScrollPos = scrollPos
-        virtualPos = Math.min(scrollPos, getRailPx())
-        commit()
-        container.addEventListener("scroll", onScroll as EventListener, { passive: true })
-        container.addEventListener("scrollend", onScrollEnd, { passive: true })
-        attached = container
-      }
-    })
-
-    onCleanup(() => {
-      if (attached) {
-        attached.removeEventListener("scroll", onScroll as EventListener)
-        attached.removeEventListener("scrollend", onScrollEnd)
-      }
-      if (rafId !== null) cancelAnimationFrame(rafId)
-    })
+  // Re-run commit when actualSize changes during a partial scroll-toward reveal
+  // so reservedSize stays in sync. Only meaningful when mid-scroll (virtualPos > 0).
+  createEffect(() => {
+    void handle?.actualSize()
+    ctrl?.notifyActualSizeChanged()
   })
 
-  // ── Reveal: pointer-proximity ────────────────────────────────────────────────
-  onMount(() => {
-    if (reveal() !== "pointer-proximity") return
-
-    function onPointerMove(e: PointerEvent) {
-      const edge = props.edge
-      let distance: number
-
-      if (edge === "top") distance = e.clientY
-      else if (edge === "bottom") distance = window.innerHeight - e.clientY
-      else if (edge === "left") distance = e.clientX
-      else distance = window.innerWidth - e.clientX
-
-      const next: Visibility =
-        distance <= POINTER_PROXIMITY_THRESHOLD ? "visible" : "hidden"
-      if (next !== handle.visibility()) handle.setVisibility(next)
-    }
-
-    window.addEventListener("pointermove", onPointerMove, { passive: true })
-    onCleanup(() => window.removeEventListener("pointermove", onPointerMove))
+  // Notify controller when the scroll container changes
+  createEffect(() => {
+    void scrollContainer()
+    ctrl?.notifyScrollContainerChanged()
   })
 
   return (
     <Surface
-      ref={(h) => { handle = h }}
-      domRef={(el) => { surfaceEl = el }}
+      ref={(h: SurfaceHandle) => { handle = h }}
+      domRef={(el: HTMLElement) => { surfaceEl = el }}
       edge={props.edge}
-      overlay={overlayMode() || effectiveOccupancy() === "none"}
-      occupancy={effectiveOccupancy()}
+      overlay={overlayMode()}
+      occupancy={occupancy()}
       reveal={reveal()}
       order={props.order ?? 0}
       span={props.span}

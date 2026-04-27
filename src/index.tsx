@@ -16,12 +16,15 @@ export type {
   GridStructure,
   SurfaceDescriptor,
   RegisteredSurface,
-  LayoutContextValue,
   CreateSurfaceOptions,
+} from "./lib/types"
+
+export type {
+  LayoutContextValue,
   SurfaceHandle,
   LayoutRootProps,
   BodyProps,
   SurfaceProps,
   RailProps,
   OverlayProps,
-} from "./lib/types"
+} from "./lib/solid-types"

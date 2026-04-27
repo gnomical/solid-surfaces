@@ -1,0 +1,1 @@
+- Chip's reveal prop type includes "scroll-away", but the library’s Reveal union (and Rail in the demo) uses "scroll-toward" / "pointer-proximity" / "always" / "manual". Keeping demo terminology aligned with the library API will avoid confusion (and makes it easier to reuse types directly).
