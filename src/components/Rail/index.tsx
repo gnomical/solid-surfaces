@@ -18,11 +18,9 @@ export function Rail(props: RailProps) {
 
   const reveal = () => props.reveal ?? "always"
   const breakpoint = () => props.breakpoint ?? DEFAULT_BREAKPOINT
-  const initialOccupancy: Occupancy = props.occupancy ?? "reserved"
 
-  const [overlayMode, setOverlayMode] = createSignal(false)
-  const effectiveOccupancy = (): Occupancy =>
-    overlayMode() ? "none" : initialOccupancy
+  const [occupancy, setOccupancy] = createSignal<Occupancy>(props.occupancy ?? "reserved")
+  const overlayMode = () => occupancy() === "none"
 
   const scrollStyle = (): JSX.CSSProperties => props.style ?? {}
 
@@ -32,7 +30,7 @@ export function Rail(props: RailProps) {
 
   // Sync occupancy changes back to context
   createEffect(() => {
-    if (handle) updateSurface(handle.id, { occupancy: effectiveOccupancy() })
+    if (handle) updateSurface(handle.id, { occupancy: occupancy() })
   })
 
   onMount(() => {
@@ -45,10 +43,9 @@ export function Rail(props: RailProps) {
       getActualSize: () => parseFloat(handle.actualSize()) || 0,
       onVisibilityChange: (v) => {
         handle.setVisibility(v)
-        if (reveal() !== "scroll-toward") setOverlayMode(v === "hidden")
       },
       onReservedSizeChange: (size) => updateSurface(handle.id, { reservedSize: size }),
-      onOccupancyChange: (occ) => setOverlayMode(occ === "none"),
+      onOccupancyChange: setOccupancy,
     })
 
     ctrl.connect(surfaceEl)
@@ -73,8 +70,8 @@ export function Rail(props: RailProps) {
       ref={(h: SurfaceHandle) => { handle = h }}
       domRef={(el: HTMLElement) => { surfaceEl = el }}
       edge={props.edge}
-      overlay={overlayMode() || effectiveOccupancy() === "none"}
-      occupancy={effectiveOccupancy()}
+      overlay={overlayMode()}
+      occupancy={occupancy()}
       reveal={reveal()}
       order={props.order ?? 0}
       span={props.span}
