@@ -1,5 +1,5 @@
 {
-  "name": "solid-surfaces-demo",
+  "name": "surface-kit-demo",
   "type": "module",
   "scripts": {
     "setup": "pnpm install --ignore-workspace && pnpm approve-builds --all",
@@ -12,6 +12,7 @@
     "shiki": "^4.0.2",
     "solid-js": "^1.9.12",
     "solid-surfaces": "file:..",
+    "solid-theme-provider": "^1.1.1",
     "vite": "^7.3.2"
   },
   "devDependencies": {
