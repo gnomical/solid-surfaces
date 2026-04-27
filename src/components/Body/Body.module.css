@@ -1,0 +1,6 @@
+.body {
+  grid-area: ss-body;
+  overflow: auto;
+  min-width: 0;
+  min-height: 0;
+}

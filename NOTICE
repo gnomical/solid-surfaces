@@ -1,0 +1,11 @@
+solid-surfaces
+
+Copyright 2026 Jacob Kofron
+
+This project introduces a layout orchestration model based on
+edge-aware surfaces with explicit participation in shared layout.
+
+Original concept, design, and implementation by Jacob Kofron.
+
+Project home:
+https://github.com/gnomical/solid-surfaces

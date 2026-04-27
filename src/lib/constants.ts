@@ -1,0 +1,2 @@
+export const DEFAULT_BREAKPOINT = 768
+export const POINTER_PROXIMITY_THRESHOLD = 48
