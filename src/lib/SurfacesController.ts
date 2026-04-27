@@ -5,8 +5,6 @@ import type {
   SurfaceDescriptor,
 } from "./types"
 
-let idCounter = 0
-
 export class SurfacesController {
   private _surfaces: RegisteredSurface[] = []
   private _scrollContainer: HTMLElement | null = null
@@ -42,7 +40,7 @@ export class SurfacesController {
   }
 
   registerSurface(descriptor: SurfaceDescriptor): string {
-    const id = `ss-surface-${++idCounter}`
+    const id = `ss-surface-${crypto.randomUUID()}`
     this._surfaces = [...this._surfaces, { ...descriptor, id }]
     this.notify()
     return id
