@@ -142,7 +142,17 @@ const handle = createSurface({
 })
 ```
 
-This gives full control over reveal logic and occupancy transitions for custom behaviors. Size the associated element via CSS; the library measures it automatically.
+This gives full control over reveal logic and occupancy transitions for custom behaviors. `createSurface` only registers a descriptor and returns a handle — it does not measure anything. The grid track starts at `"0px"` until you call `handle.setActualSize()`. You are responsible for measurement, typically via a `ResizeObserver` on your content element:
+
+```tsx
+const ro = new ResizeObserver((entries) => {
+  const size = entries[0].borderBoxSize?.[0]?.blockSize ?? entries[0].contentRect.height
+  if (size > 0) handle.setActualSize(`${size}px`)
+})
+ro.observe(myContentElement, { box: "border-box" })
+```
+
+The `Surface` component does this for you; `createSurface` is the escape hatch for cases where you need to bring your own rendering and measurement.
 
 ## Design goals
 
