@@ -5,6 +5,7 @@ import { CLOSE_ICON } from "./lib/constants"
 import { Button } from "./components/Button"
 import { ThemeToggle } from "./components/ThemeToggle"
 import { JourneySection } from "./components/JourneySection"
+import { CodeBlock } from "./components/Code"
 
 export default function App() {
   const [step, setStep] = createSignal(0)
@@ -25,7 +26,7 @@ export default function App() {
       <ThemeToggle classList={{'theme-toggle': true}}/>
 
       <Show when={headerAdded()}>
-        <Rail edge="top" occupancy="reserved">
+        <Rail edge="top">
           <div class="surface horizontal header">
             <span class="brand">Surface Kit</span>
           </div>
@@ -94,6 +95,11 @@ export default function App() {
               The grid reacts automatically. No manual offset calculations, no fighting
               with <code>position</code>.
             </p>
+            <CodeBlock code={`<Rail edge="top">
+  <div class="header">
+    <span>Surface Kit</span>
+  </div>
+</Rail>`} />
             <Button
               style={{ "align-self": "flex-start" }}
               onClick={() => setHeaderAdded(v => !v)}

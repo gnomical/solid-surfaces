@@ -185,7 +185,7 @@ p {
   font-weight: 700;
 }
 
-.journey-section code {
+.journey-section > p > code {
   font-family: "Roboto Mono", monospace;
   font-size: 0.9em;
   background: var(--stp-foreground-alpha-quaternary);
