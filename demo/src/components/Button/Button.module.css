@@ -21,6 +21,11 @@
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--stp-shadow);
   }
+
+  &:active:not(:disabled) {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--stp-shadow);
+  }
 }
 
 /* Sizes */
