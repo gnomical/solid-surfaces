@@ -1,27 +1,13 @@
-import { createSignal, onMount } from "solid-js"
+import { createSignal } from "solid-js"
 import { LayoutRoot, Overlay, Body } from "solid-surfaces"
 import "./app.css"
 import { CLOSE_ICON } from "./lib/constants"
+import { Button } from "./components/Button"
 import { ThemeToggle } from "./components/ThemeToggle"
 
 export default function App() {
   const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
   const [overlayOpen, setOverlayOpen] = createSignal(false)
-
-  let layoutRootSectionRef!: HTMLElement
-
-  onMount(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setLayoutRootActivated(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.3 }
-    )
-    observer.observe(layoutRootSectionRef)
-  })
 
   return (
     <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"}>
@@ -42,26 +28,32 @@ export default function App() {
             <p>
               <strong>Surface Kit</strong> is a layout library that makes
               edge-attached UI surfaces composable. It coordinates a CSS Grid where
-              each surface declares its edge, stacking order, and behavior. 
-              The grid responds automatically. Corners are allocated. Breakpoints 
+              each surface declares its edge, stacking order, and behavior.
+              The grid responds automatically. Corners are allocated. Breakpoints
               are respected. Scroll-reveal is built in.
             </p>
             <p>This is a guided tour of the library. Scroll to see each concept come to life.</p>
           </section>
 
-          <section class="journey-section" ref={layoutRootSectionRef}>
+          <section class="journey-section">
             <h2>LayoutRoot</h2>
             <p>
-              Every solid-surfaces layout starts with <code>LayoutRoot</code>. It is the
+              Every Surface Kit layout starts with <code>LayoutRoot</code>. It is the
               root grid container — a single <code>div</code> that fills its parent and
               manages a CSS Grid whose tracks are computed dynamically as surfaces register
               themselves.
             </p>
             <p>
-              You can see <code>LayoutRoot</code> right now: it is the outermost element
-              wrapping this entire viewport. The border appearing around the page is the{" "}
-              <code>LayoutRoot</code> element itself, styled to make its boundary visible.
+              <code>LayoutRoot</code> is the outermost element wrapping this entire
+              viewport. Reveal it:
             </p>
+            <Button
+              style={{ "align-self": "flex-start" }}
+              disabled={layoutRootActivated()}
+              onClick={() => setLayoutRootActivated(true)}
+            >
+              {layoutRootActivated() ? "Revealed" : "Reveal It"}
+            </Button>
             <p>
               <code>LayoutRoot</code> accepts an <code>axisPriority</code> prop —{" "}
               <code>"horizontal"</code> or <code>"vertical"</code> — which determines which

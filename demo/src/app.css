@@ -76,7 +76,7 @@ button:hover {
   inset: 0;
   border-radius: 2px;
   border: 0 solid var(--stp-background);
-  transition: inset 1s 1s ease, border-width 1s 1s ease, border-color 1s 1s ease;
+  transition: inset 1s ease, border-width 1s ease, border-color 1s ease;
   &.activated {
     inset: 16px;
     border-width: var(--border-size);
@@ -177,9 +177,10 @@ button:hover {
 .journey-section {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 1rem;
-  padding-top: 20vh;
-  padding-bottom: 20vh;
+  min-height: 100vh;
+  padding: 4rem 0;
 }
 
 .intro-section h1 {
