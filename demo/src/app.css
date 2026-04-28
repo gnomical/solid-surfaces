@@ -188,7 +188,7 @@ p {
 .journey-section code {
   font-family: "Roboto Mono", monospace;
   font-size: 0.9em;
-  background: color-mix(in srgb, var(--stp-foreground) 8%, transparent);
+  background: var(--stp-foreground-alpha-quaternary);
   padding: 0.1em 0.35em;
   border-radius: 3px;
 }

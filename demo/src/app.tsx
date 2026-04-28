@@ -1,5 +1,5 @@
-import { createSignal, createEffect } from "solid-js"
-import { LayoutRoot, Overlay, Body } from "solid-surfaces"
+import { createSignal, Show } from "solid-js"
+import { LayoutRoot, Overlay, Body, Rail } from "solid-surfaces"
 import "./app.css"
 import { CLOSE_ICON } from "./lib/constants"
 import { Button } from "./components/Button"
@@ -9,24 +9,35 @@ import { JourneySection } from "./components/JourneySection"
 export default function App() {
   const [step, setStep] = createSignal(0)
   const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
+  const [headerAdded, setHeaderAdded] = createSignal(false)
   const [overlayOpen, setOverlayOpen] = createSignal(false)
 
   let layoutRootSection!: HTMLElement
+  let railsSection!: HTMLElement
 
-  createEffect(() => {
-    if (step() === 1) layoutRootSection?.scrollIntoView({ behavior: "smooth", block: "start" })
-  })
+  const revealAndScroll = (nextStep: number, getEl: () => HTMLElement) => {
+    setStep(nextStep)
+    queueMicrotask(() => getEl()?.scrollIntoView({ behavior: "smooth", block: "start" }))
+  }
 
   return (
     <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"}>
       <ThemeToggle classList={{'theme-toggle': true}}/>
+
+      <Show when={headerAdded()}>
+        <Rail edge="top" occupancy="reserved">
+          <div class="surface horizontal header">
+            <span class="brand">Surface Kit</span>
+          </div>
+        </Rail>
+      </Show>
 
       <Body>
         <div class="body-content">
 
           <JourneySection
             class="intro-section"
-            onContinue={() => setStep(1)}
+            onContinue={() => revealAndScroll(1, () => layoutRootSection)}
           >
             <h1>Surface Kit</h1>
             <p>
@@ -45,7 +56,12 @@ export default function App() {
             <p>This is a guided tour of the library.</p>
           </JourneySection>
 
-          <JourneySection ref={layoutRootSection} show={step() >= 1}>
+          <JourneySection
+            ref={layoutRootSection}
+            show={step() >= 1}
+            onContinue={layoutRootActivated() ? () => revealAndScroll(2, () => railsSection) : undefined}
+            continueLabel="Next"
+          >
             <h2>LayoutRoot</h2>
             <p>
               Every Surface Kit layout starts with <code>LayoutRoot</code>. It is the
@@ -64,12 +80,27 @@ export default function App() {
             >
               {layoutRootActivated() ? "Revealed" : "Reveal It"}
             </Button>
+          </JourneySection>
+
+          <JourneySection ref={railsSection} show={step() >= 2}>
+            <h2>Rails</h2>
             <p>
-              <code>LayoutRoot</code> accepts an <code>axisPriority</code> prop —{" "}
-              <code>"horizontal"</code> or <code>"vertical"</code> — which determines which
-              axis owns corner cells when surfaces on crossing edges both want them. It also
-              accepts a <code>corners</code> prop for per-corner explicit overrides.
+              A <code>Rail</code> is a reserved surface — it claims a track in the grid
+              and pushes the body content aside. Rails attach to any edge:{" "}
+              <code>top</code>, <code>bottom</code>, <code>left</code>, or{" "}
+              <code>right</code>.
             </p>
+            <p>
+              The grid reacts automatically. No manual offset calculations, no fighting
+              with <code>position</code>.
+            </p>
+            <Button
+              style={{ "align-self": "flex-start" }}
+              disabled={headerAdded()}
+              onClick={() => setHeaderAdded(true)}
+            >
+              {headerAdded() ? "Header Added" : "Add Header"}
+            </Button>
           </JourneySection>
 
         </div>
