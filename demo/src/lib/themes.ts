@@ -25,7 +25,7 @@ export const themes: ThemesConfig = {
         background: "#ffffff",
         foreground: "#111111",
         accent: "#8800ff",
-        shadow: "#FF6B6B",
+        shadow: "#ff6b8e",
       },
     },
   },

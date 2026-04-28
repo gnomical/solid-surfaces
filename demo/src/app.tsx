@@ -1,13 +1,21 @@
-import { createSignal } from "solid-js"
+import { createSignal, createEffect } from "solid-js"
 import { LayoutRoot, Overlay, Body } from "solid-surfaces"
 import "./app.css"
 import { CLOSE_ICON } from "./lib/constants"
 import { Button } from "./components/Button"
 import { ThemeToggle } from "./components/ThemeToggle"
+import { JourneySection } from "./components/JourneySection"
 
 export default function App() {
+  const [step, setStep] = createSignal(0)
   const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
   const [overlayOpen, setOverlayOpen] = createSignal(false)
+
+  let layoutRootSection!: HTMLElement
+
+  createEffect(() => {
+    if (step() === 1) layoutRootSection?.scrollIntoView({ behavior: "smooth", block: "start" })
+  })
 
   return (
     <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"}>
@@ -16,12 +24,15 @@ export default function App() {
       <Body>
         <div class="body-content">
 
-          <section class="journey-section intro-section">
+          <JourneySection
+            class="intro-section"
+            onContinue={() => setStep(1)}
+          >
             <h1>Surface Kit</h1>
             <p>
               Building UIs that need sidebars, headers, drawers, and navigation panels
               means wrestling with layout. Surfaces pile up. Responsive breakpoints get kicked
-              down the road. Complex animations need coordination between multiple surfaces. 
+              down the road. Complex animations need coordination between multiple surfaces.
               And all the while, your main content needs to stay centered and unbroken.
             </p>
             <p>
@@ -31,10 +42,10 @@ export default function App() {
               The grid responds automatically. Corners are allocated. Breakpoints
               are respected. Reveal behavior is built in.
             </p>
-            <p>This is a guided tour of the library. Scroll to see each concept come to life.</p>
-          </section>
+            <p>This is a guided tour of the library.</p>
+          </JourneySection>
 
-          <section class="journey-section">
+          <JourneySection ref={layoutRootSection} show={step() >= 1}>
             <h2>LayoutRoot</h2>
             <p>
               Every Surface Kit layout starts with <code>LayoutRoot</code>. It is the
@@ -59,7 +70,7 @@ export default function App() {
               axis owns corner cells when surfaces on crossing edges both want them. It also
               accepts a <code>corners</code> prop for per-corner explicit overrides.
             </p>
-          </section>
+          </JourneySection>
 
         </div>
       </Body>

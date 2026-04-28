@@ -52,7 +52,7 @@ p {
 .theme-toggle {
   position: absolute;
   top: 0.75rem;
-  right: 2rem;
+  right: 1.5rem;
   z-index: 2;
 }
 
