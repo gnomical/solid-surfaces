@@ -1,125 +1,82 @@
-import { createSignal, For } from "solid-js"
-import { LayoutRoot, Rail, Overlay, Body } from "solid-surfaces"
-import type { AxisPriority } from "solid-surfaces"
+import { createSignal, onMount } from "solid-js"
+import { LayoutRoot, Overlay, Body } from "solid-surfaces"
 import "./app.css"
-import { CLOSE_ICON, SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
-import { Chip } from "./components/Chip"
+import { CLOSE_ICON } from "./lib/constants"
 import { ThemeToggle } from "./components/ThemeToggle"
 
-const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-sunt in culpa qui officia deserunt mollit anim id est laborum.`
-
 export default function App() {
+  const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
   const [overlayOpen, setOverlayOpen] = createSignal(false)
-  const [axisPriority, setAxisPriority] = createSignal<AxisPriority>("horizontal")
-  const [overlaySpanInset, setOverlaySpanInset] = createSignal(false)
-  const [navVisible, setNavVisible] = createSignal(false)
+
+  let layoutRootSectionRef!: HTMLElement
+
+  onMount(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setLayoutRootActivated(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.3 }
+    )
+    observer.observe(layoutRootSectionRef)
+  })
 
   return (
-    <LayoutRoot class="root" axisPriority={axisPriority()}>
+    <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"}>
       <ThemeToggle classList={{'theme-toggle': true}}/>
 
-      {/* Top rail — hides on scroll down, reveals on scroll up; span=full claims corners */}
-      {/* <Rail edge="top" reveal="scroll-toward" span="full">
-        <header class="surface horizontal header">
-          <span class="brand">solid-surfaces</span>
-          <Chip type="Rail" edge="top" reveal="scroll-toward" />
-          <button onClick={() => setOverlayOpen((v) => !v)} style="transform: rotate(-90deg)">
-            {overlayOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
-          </button>
-        </header>
-      </Rail> */}
-
-      {/* Left rail (order=0) — icon bar, reserved on desktop */}
-      {/* <Rail edge="left" order={0}>
-        <nav class="surface vertical nav icon-bar">
-          <span class="nav-icon">⊞</span>
-          <span class="nav-icon">⊟</span>
-          <span class="nav-icon">⊠</span>
-          <div style={{ "margin-top": "auto", "width": "1.2em" }}>
-            <Chip vertical type="Rail" edge="left" order={0} />
-          </div>
-        </nav>
-      </Rail> */}
-
-      {/* Left rail (order=1) — file tree, inset from the icon bar */}
-      {/* <Rail edge="left" order={1} responsive breakpoint={768}>
-        <nav class="surface vertical nav">
-          <span>Nav item 1</span>
-          <span>Nav item 2</span>
-          <span>Nav item 3</span>
-          <div style={{ "margin-top": "auto"}}>
-            <Chip vertical type="Rail" edge="left" order={1} breakpoint={768} />
-          </div>
-        </nav>
-      </Rail> */}
-
-      {/* Body */}
       <Body>
         <div class="body-content">
-          <h1>Surface Kit</h1>
 
-          <div class="controls">
-            <label>
-              <span>axisPriority</span>
-              <select
-                value={axisPriority()}
-                onChange={(e) => setAxisPriority(e.currentTarget.value as AxisPriority)}
-              >
-                <option value="horizontal">horizontal (top/bottom own corners)</option>
-                <option value="vertical">vertical (left/right own corners)</option>
-              </select>
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={overlaySpanInset()}
-                onChange={(e) => setOverlaySpanInset(e.currentTarget.checked)}
-              />
-              {" "}Overlay span="inset" (bounded by top rail)
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={navVisible()}
-                onChange={(e) => setNavVisible(e.currentTarget.checked)}
-              />
-              {" "}Nav rail visible (animate)
-            </label>
-          </div>
+          <section class="journey-section intro-section">
+            <h1>Surface Kit</h1>
+            <p>
+              Building UIs that need sidebars, headers, drawers, and navigation panels
+              means wrestling with layout. Surfaces pile up. Responsive breakpoints
+              collapse some panels into overlays while others stay reserved. Scroll
+              behavior hides or reveals things at different thresholds. And all the while,
+              your main content needs to stay centered and unbroken.
+            </p>
+            <p>
+              <strong>Surface Kit</strong> is a layout library that makes
+              edge-attached UI surfaces composable. It coordinates a CSS Grid where
+              each surface declares its edge, stacking order, and behavior. 
+              The grid responds automatically. Corners are allocated. Breakpoints 
+              are respected. Scroll-reveal is built in.
+            </p>
+            <p>This is a guided tour of the library. Scroll to see each concept come to life.</p>
+          </section>
 
-          <p>
-            Two left Rails with different <code>order</code> values each get their own
-            column track. The top Rail uses <code>span="full"</code>. Toggle{" "}
-            <code>axisPriority</code> above to shift corner ownership between the top/bottom
-            and left/right rails.
-          </p>
-          <p>
-            Resize below 768px to collapse both left rails to overlay mode. Scroll to
-            hide/reveal the top rail.
-          </p>
-          <For each={Array.from({ length: 20 })}>
-            {(_, i) => (
-              <p>
-                <strong>Paragraph {i() + 1}:</strong> {LOREM}
-              </p>
-            )}
-          </For>
+          <section class="journey-section" ref={layoutRootSectionRef}>
+            <h2>LayoutRoot</h2>
+            <p>
+              Every solid-surfaces layout starts with <code>LayoutRoot</code>. It is the
+              root grid container — a single <code>div</code> that fills its parent and
+              manages a CSS Grid whose tracks are computed dynamically as surfaces register
+              themselves.
+            </p>
+            <p>
+              You can see <code>LayoutRoot</code> right now: it is the outermost element
+              wrapping this entire viewport. The border appearing around the page is the{" "}
+              <code>LayoutRoot</code> element itself, styled to make its boundary visible.
+            </p>
+            <p>
+              <code>LayoutRoot</code> accepts an <code>axisPriority</code> prop —{" "}
+              <code>"horizontal"</code> or <code>"vertical"</code> — which determines which
+              axis owns corner cells when surfaces on crossing edges both want them. It also
+              accepts a <code>corners</code> prop for per-corner explicit overrides.
+            </p>
+          </section>
+
         </div>
       </Body>
 
-      {/* Bottom overlay — demonstrates span="inset" vs span="full" */}
-      <Overlay edge="bottom" open={overlayOpen()} span={overlaySpanInset() ? "inset" : "full"}>
+      <Overlay edge="bottom" open={overlayOpen()} span="full">
         <div class="surface drawer">
-          <Chip type="Overlay" edge="bottom" span={overlaySpanInset() ? "inset" : "full"} />
           <p style={{ "margin-top": "0.5rem" }}>
-            {overlaySpanInset()
-              ? "span=\"inset\": bounded by the left rail column tracks."
-              : "span=\"full\": stretches edge to edge."}
+            An <code>Overlay</code> surface — edge-attached, but not reserved in the grid.
           </p>
           <button onClick={() => setOverlayOpen(false)} class="close">
             {CLOSE_ICON()}
