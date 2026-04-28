@@ -96,10 +96,9 @@ export default function App() {
             </p>
             <Button
               style={{ "align-self": "flex-start" }}
-              disabled={headerAdded()}
-              onClick={() => setHeaderAdded(true)}
+              onClick={() => setHeaderAdded(v => !v)}
             >
-              {headerAdded() ? "Header Added" : "Add Header"}
+              {headerAdded() ? "Remove Header" : "Add Header"}
             </Button>
           </JourneySection>
 
