@@ -20,17 +20,16 @@ export default function App() {
             <h1>Surface Kit</h1>
             <p>
               Building UIs that need sidebars, headers, drawers, and navigation panels
-              means wrestling with layout. Surfaces pile up. Responsive breakpoints
-              collapse some panels into overlays while others stay reserved. Scroll
-              behavior hides or reveals things at different thresholds. And all the while,
-              your main content needs to stay centered and unbroken.
+              means wrestling with layout. Surfaces pile up. Responsive breakpoints get kicked
+              down the road. Complex animations need coordination between multiple surfaces. 
+              And all the while, your main content needs to stay centered and unbroken.
             </p>
             <p>
               <strong>Surface Kit</strong> is a layout library that makes
               edge-attached UI surfaces composable. It coordinates a CSS Grid where
               each surface declares its edge, stacking order, and behavior.
               The grid responds automatically. Corners are allocated. Breakpoints
-              are respected. Scroll-reveal is built in.
+              are respected. Reveal behavior is built in.
             </p>
             <p>This is a guided tour of the library. Scroll to see each concept come to life.</p>
           </section>
@@ -45,7 +44,7 @@ export default function App() {
             </p>
             <p>
               <code>LayoutRoot</code> is the outermost element wrapping this entire
-              viewport. Reveal it:
+              viewport.
             </p>
             <Button
               style={{ "align-self": "flex-start" }}
