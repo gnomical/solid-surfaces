@@ -4,6 +4,7 @@ import type { AxisPriority } from "solid-surfaces"
 import "./app.css"
 import { CLOSE_ICON, SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
 import { Chip } from "./components/Chip"
+import { ThemeToggle } from "./components/ThemeToggle"
 
 const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -20,8 +21,10 @@ export default function App() {
 
   return (
     <LayoutRoot class="root" axisPriority={axisPriority()}>
+      <ThemeToggle classList={{'theme-toggle': true}}/>
+
       {/* Top rail — hides on scroll down, reveals on scroll up; span=full claims corners */}
-      <Rail edge="top" reveal="scroll-toward" span="full" visibility={navVisible() ? "visible" : "hidden"} animate>
+      {/* <Rail edge="top" reveal="scroll-toward" span="full">
         <header class="surface horizontal header">
           <span class="brand">solid-surfaces</span>
           <Chip type="Rail" edge="top" reveal="scroll-toward" />
@@ -29,10 +32,10 @@ export default function App() {
             {overlayOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
           </button>
         </header>
-      </Rail>
+      </Rail> */}
 
       {/* Left rail (order=0) — icon bar, reserved on desktop */}
-      <Rail edge="left" order={0}>
+      {/* <Rail edge="left" order={0}>
         <nav class="surface vertical nav icon-bar">
           <span class="nav-icon">⊞</span>
           <span class="nav-icon">⊟</span>
@@ -41,10 +44,10 @@ export default function App() {
             <Chip vertical type="Rail" edge="left" order={0} />
           </div>
         </nav>
-      </Rail>
+      </Rail> */}
 
       {/* Left rail (order=1) — file tree, inset from the icon bar */}
-      <Rail edge="left" order={1} responsive breakpoint={768} animate visibility={navVisible() ? "visible" : "hidden"}>
+      {/* <Rail edge="left" order={1} responsive breakpoint={768}>
         <nav class="surface vertical nav">
           <span>Nav item 1</span>
           <span>Nav item 2</span>
@@ -53,12 +56,12 @@ export default function App() {
             <Chip vertical type="Rail" edge="left" order={1} breakpoint={768} />
           </div>
         </nav>
-      </Rail>
+      </Rail> */}
 
       {/* Body */}
       <Body>
         <div class="body-content">
-          <h1>Solid-Surfaces Demo</h1>
+          <h1>Surface Kit</h1>
 
           <div class="controls">
             <label>
