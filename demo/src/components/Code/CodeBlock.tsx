@@ -67,7 +67,11 @@ export function CodeBlock(props: CodeBlockProps) {
       }
     >
       <div
-        class={clicked() ? `${styles.wrapper} ${styles.clicked}` : styles.wrapper}
+        classList={{
+          [styles.wrapper]: true,
+          [styles.clicked]: clicked(),
+          [styles.copied]: copied(),
+        }}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseLeave}
