@@ -51,13 +51,13 @@ export function CodeBlock(props: CodeBlockProps) {
         </pre>
       }
     >
-      <div class={styles.wrapper}>
+      <div class={styles.wrapper} onClick={copy} title="Copy">
         <div class={styles.code} innerHTML={html()} />
-        <button class={styles.copyButton} onClick={copy} title="Copy">
+        <div class={styles.copyIcon}>
           <Show when={copied()} fallback={COPY_ICON()}>
             {CHECK_ICON()}
           </Show>
-        </button>
+        </div>
       </div>
     </Show>
   )
