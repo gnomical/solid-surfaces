@@ -1,3 +1,7 @@
+.wrapper {
+  position: relative;
+}
+
 .code {
   font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
   border: 2px solid var(--stp-foreground);
@@ -8,5 +12,24 @@
     overflow-x: auto;
     font-size: 0.85rem;
     line-height: 1.6;
+  }
+}
+
+.copyButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--stp-foreground-alpha-tertiary);
+
+  &:hover {
+    color: var(--stp-foreground);
   }
 }

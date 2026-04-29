@@ -1,6 +1,7 @@
-import { createResource, Show } from "solid-js"
+import { createResource, createSignal, Show } from "solid-js"
 import { createHighlighter } from "shiki"
 import { useTheme } from "solid-theme-provider"
+import { CHECK_ICON, COPY_ICON } from "../../lib/constants"
 import styles from "./Code.module.css"
 
 const shikiThemeMap: Record<string, string> = {
@@ -20,6 +21,7 @@ type CodeBlockProps = {
 
 export function CodeBlock(props: CodeBlockProps) {
   const ctx = useTheme()
+  const [copied, setCopied] = createSignal(false)
 
   const shikiTheme = () => shikiThemeMap[ctx.currentTheme()] ?? "github-dark"
 
@@ -34,6 +36,12 @@ export function CodeBlock(props: CodeBlockProps) {
     },
   )
 
+  const copy = () => {
+    navigator.clipboard.writeText(props.code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
   return (
     <Show
       when={html()}
@@ -43,7 +51,14 @@ export function CodeBlock(props: CodeBlockProps) {
         </pre>
       }
     >
-      <div class={styles.code} innerHTML={html()} />
+      <div class={styles.wrapper}>
+        <div class={styles.code} innerHTML={html()} />
+        <button class={styles.copyButton} onClick={copy} title="Copy">
+          <Show when={copied()} fallback={COPY_ICON()}>
+            {CHECK_ICON()}
+          </Show>
+        </button>
+      </div>
     </Show>
   )
 }
