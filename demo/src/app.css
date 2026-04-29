@@ -72,6 +72,12 @@ p {
     border-color: var(--stp-foreground);
     animation: border-blink 0.2s steps(1) 0.5s;
     animation-iteration-count: 3;
+
+    .copyright {
+      left: 2rem;
+      bottom: 1.75rem;
+      transition: left 0.5s ease, bottom 0.5s ease;
+    }
   }
 }
 
@@ -153,6 +159,16 @@ p {
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
   border: 1px solid #ccc;
+}
+
+.copyright {
+  position: fixed;
+  bottom: 1rem;
+  left: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--stp-foreground-alpha-secondary);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .body-content {

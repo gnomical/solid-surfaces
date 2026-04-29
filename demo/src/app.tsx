@@ -116,6 +116,8 @@ export default function App() {
         </div>
       </Body>
 
+      <div class="copyright">© {new Date().getFullYear()} Jacob Kofron</div>
+
       <Overlay edge="bottom" open={overlayOpen()} span="full">
         <div class="surface drawer">
           <p style={{ "margin-top": "0.5rem" }}>
