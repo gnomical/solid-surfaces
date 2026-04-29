@@ -37,7 +37,6 @@ export default function App() {
         <div class="body-content">
 
           <JourneySection
-            class="intro-section"
             onContinue={() => revealAndScroll(1, () => layoutRootSection)}
           >
             <h1>Surface Kit</h1>
@@ -60,6 +59,14 @@ export default function App() {
           <JourneySection
             ref={layoutRootSection}
             show={step() >= 1}
+            action={
+              <Button
+                disabled={layoutRootActivated()}
+                onClick={() => setLayoutRootActivated(true)}
+              >
+                {layoutRootActivated() ? "Revealed" : "Reveal It"}
+              </Button>
+            }
             onContinue={layoutRootActivated() ? () => revealAndScroll(2, () => railsSection) : undefined}
             continueLabel="Next"
           >
@@ -74,16 +81,20 @@ export default function App() {
               <code>LayoutRoot</code> is the outermost element wrapping this entire
               viewport.
             </p>
-            <Button
-              style={{ "align-self": "flex-start" }}
-              disabled={layoutRootActivated()}
-              onClick={() => setLayoutRootActivated(true)}
-            >
-              {layoutRootActivated() ? "Revealed" : "Reveal It"}
-            </Button>
           </JourneySection>
 
-          <JourneySection ref={railsSection} show={step() >= 2}>
+          <JourneySection
+            ref={railsSection}
+            show={step() >= 2}
+            action={
+              <Button
+                disabled={headerAdded()}
+                onClick={() => setHeaderAdded(true)}
+              >
+                {headerAdded() ? "Header Added" : "Add Header"}
+              </Button>
+            }
+          >
             <h2>Rails</h2>
             <p>
               A <code>Rail</code> is a reserved surface — it claims a track in the grid
@@ -100,13 +111,6 @@ export default function App() {
     <span>Surface Kit</span>
   </div>
 </Rail>`} />
-            <Button
-              style={{ "align-self": "flex-start" }}
-              disabled={headerAdded()}
-              onClick={() => setHeaderAdded(true)}
-            >
-              {headerAdded() ? "Header Added" : "Add Header"}
-            </Button>
           </JourneySection>
 
         </div>
