@@ -102,9 +102,10 @@ export default function App() {
 </Rail>`} />
             <Button
               style={{ "align-self": "flex-start" }}
-              onClick={() => setHeaderAdded(v => !v)}
+              disabled={headerAdded()}
+              onClick={() => setHeaderAdded(true)}
             >
-              {headerAdded() ? "Remove Header" : "Add Header"}
+              Add Header
             </Button>
           </JourneySection>
 

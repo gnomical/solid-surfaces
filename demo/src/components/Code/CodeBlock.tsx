@@ -4,12 +4,12 @@ import { useTheme } from "solid-theme-provider"
 import styles from "./Code.module.css"
 
 const shikiThemeMap: Record<string, string> = {
-  dark: "laserwave",
-  light: "catppuccin-latte",
+  dark: "aurora-x",
+  light: "light-plus",
 }
 
 const highlighterPromise = createHighlighter({
-  themes: ["catppuccin-latte", "laserwave"],
+  themes: ["aurora-x", "light-plus"],
   langs: ["tsx", "html", "css", "json"],
 })
 

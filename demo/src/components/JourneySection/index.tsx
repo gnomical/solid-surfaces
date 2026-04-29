@@ -20,7 +20,7 @@ export function JourneySection(props: JourneySectionProps) {
         {local.children}
         <Show when={local.onContinue}>
           <Button
-            style={{ "align-self": "flex-start", "margin-top": "1rem" }}
+            style={{ "align-self": "flex-end", "margin-top": "1rem" }}
             onClick={local.onContinue}
           >
             {local.continueLabel ?? "Continue"}
