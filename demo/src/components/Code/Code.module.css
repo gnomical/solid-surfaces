@@ -2,7 +2,7 @@
   position: relative;
   cursor: pointer;
 
-  &:hover {
+  &:hover:not(.clicked) {
     .code {
       transform: translate(-2px, -2px);
       box-shadow: 9px 9px 0 var(--stp-foreground-alpha-primary);
@@ -13,14 +13,14 @@
     }
   }
 
-  &:active {
+  &:active:not(.clicked) {
     .code {
-      transform: translate(1px, 1px);
-      box-shadow: 4px 4px 0 var(--stp-foreground-alpha-primary);
+      transform: translate(2px, 2px);
+      box-shadow: 3px 3px 0 var(--stp-foreground-alpha-primary);
     }
     .copyIcon {
-      top: calc(0.75rem + 1px);
-      right: calc(1rem - 1px);
+      top: calc(0.75rem + 2px);
+      right: calc(1rem - 2px);
     }
   }
 }
@@ -52,7 +52,11 @@
   color: var(--stp-foreground-alpha-tertiary);
   pointer-events: none;
 
-  .wrapper:hover & {
+  .wrapper:hover:not(.clicked) & {
+    color: var(--stp-foreground);
+  }
+
+  .wrapper.clicked & {
     color: var(--stp-foreground);
   }
 }

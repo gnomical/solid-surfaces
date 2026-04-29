@@ -22,6 +22,7 @@ type CodeBlockProps = {
 export function CodeBlock(props: CodeBlockProps) {
   const ctx = useTheme()
   const [copied, setCopied] = createSignal(false)
+  const [clicked, setClicked] = createSignal(false)
 
   const shikiTheme = () => shikiThemeMap[ctx.currentTheme()] ?? "github-dark"
 
@@ -36,10 +37,24 @@ export function CodeBlock(props: CodeBlockProps) {
     },
   )
 
-  const copy = () => {
+  let pendingCopy = false
+
+  const onMouseDown = () => {
     navigator.clipboard.writeText(props.code)
     setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+    pendingCopy = true
+  }
+
+  const onMouseUp = () => {
+    if (pendingCopy) {
+      pendingCopy = false
+      setClicked(true)
+    }
+  }
+
+  const onMouseLeave = () => {
+    pendingCopy = false
+    if (clicked()) setTimeout(() => { setClicked(false); setCopied(false) }, 1500)
   }
 
   return (
@@ -51,7 +66,13 @@ export function CodeBlock(props: CodeBlockProps) {
         </pre>
       }
     >
-      <div class={styles.wrapper} onClick={copy} title="Copy">
+      <div
+        class={clicked() ? `${styles.wrapper} ${styles.clicked}` : styles.wrapper}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseLeave}
+        title="Copy"
+      >
         <div class={styles.code} innerHTML={html()} />
         <div class={styles.copyIcon}>
           <Show when={copied()} fallback={COPY_ICON()}>
