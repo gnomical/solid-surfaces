@@ -71,7 +71,7 @@ p {
     border-width: var(--border-size);
     border-color: var(--stp-foreground);
     animation: border-blink 0.2s steps(1) 0.5s;
-    animation-iteration-count: 4;
+    animation-iteration-count: 3;
   }
 }
 

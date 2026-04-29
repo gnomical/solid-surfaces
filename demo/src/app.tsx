@@ -105,7 +105,7 @@ export default function App() {
               disabled={headerAdded()}
               onClick={() => setHeaderAdded(true)}
             >
-              Add Header
+              {headerAdded() ? "Header Added" : "Add Header"}
             </Button>
           </JourneySection>
 

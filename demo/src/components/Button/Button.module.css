@@ -13,7 +13,8 @@
   transition: transform 0.1s, box-shadow 0.1s;
 
   &:disabled {
-    opacity: 0.5;
+    color: var(--stp-foreground-alpha-tertiary);
+    border-color: var(--stp-foreground-alpha-tertiary);
     cursor: not-allowed;
     box-shadow: none;
   }
