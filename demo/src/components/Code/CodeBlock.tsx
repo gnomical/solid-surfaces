@@ -80,7 +80,7 @@ export function CodeBlock(props: CodeBlockProps) {
         <div class={styles.code} innerHTML={html()} />
         <div class={styles.copyIcon}>
           <Show when={copied()} fallback={COPY_ICON()}>
-            {CHECK_ICON()}
+            Copied {CHECK_ICON()}
           </Show>
         </div>
       </div>

@@ -8,8 +8,8 @@
       box-shadow: 9px 9px 0 var(--stp-foreground-alpha-primary);
     }
     .copyIcon {
-      top: calc(0.75rem - 2px);
-      right: calc(1rem + 2px);
+      top: calc(1rem - 2px);
+      right: calc(1.25rem + 2px);
     }
   }
 
@@ -19,8 +19,8 @@
       box-shadow: 3px 3px 0 var(--stp-foreground-alpha-primary);
     }
     .copyIcon {
-      top: calc(0.75rem + 2px);
-      right: calc(1rem - 2px);
+      top: calc(1rem + 2px);
+      right: calc(1.25rem - 2px);
     }
   }
 }
@@ -42,13 +42,11 @@
 
 .copyIcon {
   position: absolute;
-  top: 0.75rem;
-  right: 1rem;
+  top: 1rem;
+  right: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
   color: var(--stp-foreground-alpha-tertiary);
   pointer-events: none;
 

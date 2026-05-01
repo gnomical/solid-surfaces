@@ -11,6 +11,7 @@
   cursor: pointer;
   box-shadow: 4px 4px 0 var(--stp-shadow);
   transition: transform 0.1s, box-shadow 0.1s;
+  min-height: 1.8em;
 
   &:disabled {
     color: var(--stp-foreground-alpha-tertiary);
@@ -36,6 +37,9 @@
 .lg { padding: 0.75em 1.75em; font-size: 1.125rem; }
 
 /* Variants */
+.secondary {
+  --stp-shadow: var(--stp-foreground-alpha-primary);
+}
 /* .filled {
   background-color: var(--color-primary, #6c63ff);
   color: var(--color-on-primary, #fff);

@@ -3,7 +3,7 @@ import type { ComponentProps } from "solid-js"
 import styles from "./Button.module.css"
 
 type ButtonProps = ComponentProps<"button"> & {
-  variant?: "filled" | "outlined" | "ghost"
+  variant?: "primary" | "secondary" | "ghost"
   size?: "sm" | "md" | "lg"
 }
 

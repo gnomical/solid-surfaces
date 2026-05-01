@@ -1,7 +1,7 @@
 import { createSignal, Show } from "solid-js"
 import { LayoutRoot, Overlay, Body, Rail } from "solid-surfaces"
 import "./app.css"
-import { CLOSE_ICON } from "./lib/constants"
+import { CLOSE_ICON, SQUARE_ROUNDED_ICON } from "./lib/constants"
 import { Button } from "./components/Button"
 import { ThemeToggle } from "./components/ThemeToggle"
 import { JourneySection } from "./components/JourneySection"
@@ -11,10 +11,16 @@ export default function App() {
   const [step, setStep] = createSignal(0)
   const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
   const [headerAdded, setHeaderAdded] = createSignal(false)
+  const [iconBarAdded, setIconBarAdded] = createSignal(false)
+  const [navAdded, setNavAdded] = createSignal(false)
+  const [navSpan, setNavSpan] = createSignal<"inset" | "full">("full")
+  const [axisPriority, setAxisPriority] = createSignal<"horizontal" | "vertical">("horizontal")
   const [overlayOpen, setOverlayOpen] = createSignal(false)
 
   let layoutRootSection!: HTMLElement
   let railsSection!: HTMLElement
+  let iconBarSection!: HTMLElement
+  let navSection!: HTMLElement
 
   const revealAndScroll = (nextStep: number, getEl: () => HTMLElement) => {
     setStep(nextStep)
@@ -22,7 +28,7 @@ export default function App() {
   }
 
   return (
-    <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"}>
+    <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"} axisPriority={axisPriority()}>
       <ThemeToggle classList={{'theme-toggle': true}}/>
 
       <Show when={headerAdded()}>
@@ -32,8 +38,31 @@ export default function App() {
           </div>
         </Rail>
       </Show>
+    
+      <Show when={iconBarAdded()}>
+        <Rail edge="left" order={0}>
+          <div class="surface vertical icon-bar">
+            <Button size="sm" variant="secondary"></Button>
+            <Button size="sm" variant="secondary"></Button>
+            <Button size="sm" variant="secondary"></Button>
+            <Button size="sm" variant="secondary"></Button>
+          </div>
+        </Rail>
+      </Show>
 
-      <Body>
+      <Show when={navAdded()}>
+        <Rail edge="left" order={1} span={navSpan()}>
+          <div class="surface vertical nav">
+            <span class="brand">Nav</span>
+            <div class="nav-item"><span class="nav-icon">⌂</span><span>Home</span></div>
+            <div class="nav-item"><span class="nav-icon">◫</span><span>Layout</span></div>
+            <div class="nav-item"><span class="nav-icon">◈</span><span>Surfaces</span></div>
+            <div class="nav-item"><span class="nav-icon">⚙</span><span>Settings</span></div>
+          </div>
+        </Rail>
+      </Show>
+
+      <Body class="body">
         <div class="body-content">
 
           <JourneySection
@@ -94,6 +123,8 @@ export default function App() {
                 {headerAdded() ? "Header Added" : "Add Header"}
               </Button>
             }
+            onContinue={headerAdded() ? () => revealAndScroll(3, () => iconBarSection) : undefined}
+            continueLabel="Next"
           >
             <h2>Rails</h2>
             <p>
@@ -113,10 +144,119 @@ export default function App() {
 </Rail>`} />
           </JourneySection>
 
+          <JourneySection
+            ref={iconBarSection}
+            show={step() >= 3}
+            onContinue={iconBarAdded() ? () => revealAndScroll(4, () => navSection) : undefined}
+            continueLabel="Next"
+          >
+            <h2>axisPriority</h2>
+            <p>
+              When rails on different axes meet at a corner,{" "}
+              <code>axisPriority</code> on <code>LayoutRoot</code> decides which
+              edge wins.
+            </p>
+            <Show when={!iconBarAdded()}>
+              <p>
+                Let's add a rail to the left edge and see how it works.
+              </p>
+              <CodeBlock code={`<Rail edge="left">
+    <div class="icon-bar">…</div>
+  </Rail>`} />
+              <Button
+                  disabled={iconBarAdded()}
+                  onClick={() => setIconBarAdded(true)}
+                >
+                  Add Left Rail
+                </Button>
+            </Show>
+            <Show when={iconBarAdded()}>
+              <div class="controls">
+                <label><strong>axisPriority</strong></label>
+                <label>
+                  <input
+                    type="radio"
+                    name="axisPriority"
+                    value="horizontal"
+                    checked={axisPriority() === "horizontal"}
+                    onChange={() => setAxisPriority("horizontal")}
+                  />
+                  {" "}horizontal — header owns the corner
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="axisPriority"
+                    value="vertical"
+                    checked={axisPriority() === "vertical"}
+                    onChange={() => setAxisPriority("vertical")}
+                  />
+                  {" "}vertical — icon bar owns the corner
+                </label>
+              </div>
+            </Show>
+          </JourneySection>
+
+          <JourneySection
+            ref={navSection}
+            show={step() >= 4}
+            action={
+              <Button
+                disabled={navAdded()}
+                onClick={() => setNavAdded(true)}
+              >
+                {navAdded() ? "Nav Added" : "Add Nav Panel"}
+              </Button>
+            }
+          >
+            <h2>Stacking and Span</h2>
+            <p>
+              Multiple rails can share the same edge. The <code>order</code> prop
+              controls their stacking — lower order is closer to the viewport edge.
+              Here, the nav panel stacks to the right of the icon bar using{" "}
+              <code>{"order={1}"}</code>.
+            </p>
+            <CodeBlock code={`<Rail edge="left" order={0}>
+  <div class="icon-bar">…</div>
+</Rail>
+
+<Rail edge="left" order={1} span="full">
+  <nav class="nav">…</nav>
+</Rail>`} />
+            <p>
+              The <code>span</code> prop lets a rail claim corner cells explicitly.
+              The default is <code>"full"</code> — the nav panel owns the corner
+              unconditionally, regardless of <code>axisPriority</code>. Switch to{" "}
+              <code>"inset"</code> to defer back to <code>axisPriority</code>.
+            </p>
+            <div class="controls">
+              <label><strong>nav panel span</strong></label>
+              <label>
+                <input
+                  type="radio"
+                  name="navSpan"
+                  value="full"
+                  checked={navSpan() === "full"}
+                  onChange={() => setNavSpan("full")}
+                />
+                {" "}full — nav panel always owns the corner
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="navSpan"
+                  value="inset"
+                  checked={navSpan() === "inset"}
+                  onChange={() => setNavSpan("inset")}
+                />
+                {" "}inset — axisPriority governs the corner
+              </label>
+            </div>
+          </JourneySection>
+
+          <div class="copyright">© {new Date().getFullYear()} Jacob Kofron</div>
         </div>
       </Body>
-
-      <div class="copyright">© {new Date().getFullYear()} Jacob Kofron</div>
 
       <Overlay edge="bottom" open={overlayOpen()} span="full">
         <div class="surface drawer">

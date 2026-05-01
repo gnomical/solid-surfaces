@@ -3,7 +3,8 @@
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
-  min-height: 100vh;
+  min-height: 100%;
+  max-width: 600px;
   padding: 4rem 0;
 }
 
