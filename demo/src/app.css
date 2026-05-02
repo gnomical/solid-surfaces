@@ -91,6 +91,22 @@ blockquote {
   overflow: auto;
   display: flex;
   gap: 1rem;
+  &.ghost {
+    --border: var(--border-size) solid var(--stp-foreground-alpha-quaternary);
+    /* border-color: var(--stp-foreground-alpha-quaternary); */
+  }
+  &.top {
+    border-bottom: var(--border);
+  }
+  &.left {
+    border-right: var(--border);
+  }
+  &.right {
+    border-left: var(--border);
+  }
+  &.bottom {
+    border-top: var(--border);
+  }
 }
 
 .surface.horizontal {
@@ -104,18 +120,21 @@ blockquote {
 
 .drawer {
   height: 200px;
-  align-items: flex-start;
   border: var(--border);
-  border-radius: 1rem;
+  /* border-radius: 1rem; */
   margin: 0 1rem 1rem;
   background: var(--stp-background-alpha-secondary);
+  box-shadow: 6px 6px 0 var(--stp-foreground-alpha-tertiary);
 }
 
 .header {
   min-height: 3rem;
   border-radius: 1rem 1rem 0 0;
-  border-bottom: var(--border);
+  /* border-bottom: var(--border); */
   padding: 2rem;
+  &.revealed {
+    border-bottom: var(--border);
+  }
 }
 
 .nav {

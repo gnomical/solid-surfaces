@@ -13,11 +13,12 @@ import { StackingSection } from "./sections/stacking"
 export default function App() {
   const [step, setStep] = createSignal(0)
   const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
+  const [ghostsActivated, setGhostsActivated] = createSignal(false)
   const [headerAdded, setHeaderAdded] = createSignal(false)
   const [iconBarAdded, setIconBarAdded] = createSignal(false)
   const [navAdded, setNavAdded] = createSignal(false)
   const [navSpan, setNavSpan] = createSignal<"inset" | "full">("full")
-  const [axisPriority, setAxisPriority] = createSignal<"horizontal" | "vertical">("horizontal")
+  const [axisPriority, setAxisPriority] = createSignal<"horizontal" | "vertical">("vertical")
   const [overlayOpen, setOverlayOpen] = createSignal(false)
 
   let layoutRootSection!: HTMLElement
@@ -32,15 +33,25 @@ export default function App() {
 
   return (
     <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"} axisPriority={axisPriority()}>
-      <ThemeToggle classList={{'theme-toggle': true}}/>
 
-      <Show when={headerAdded()}>
-        <Rail edge="top">
-          <div class="surface horizontal header">
-            <span class="brand">Surface Kit</span>
-          </div>
-        </Rail>
+      <Show when={ghostsActivated()}>
+        <Rail edge="top"><div class="surface horizontal header ghost"></div></Rail>
+        <Rail edge="left" span="inset"><div class="surface vertical icon-bar ghost"></div></Rail>
+        <Rail edge="left" span="inset"><div class="surface vertical nav ghost"></div></Rail>
+        <Rail edge="right"><div class="surface vertical right ghost" style={{width: "220px"}}></div></Rail>
+        <Overlay open={true} edge="bottom" span="full"><div class="surface horizontal drawer ghost" style={{height: "220px"}}></div></Overlay>
       </Show>
+
+      <Rail edge="top">
+        <div class="surface horizontal header" classList={{
+          "revealed": headerAdded(),
+        }}>
+          <Show when={headerAdded()}>
+            <span class="brand">Surface Kit</span>
+          </Show>
+          <ThemeToggle classList={{'theme-toggle': true}}/>
+        </div>
+      </Rail>
 
       <Show when={iconBarAdded()}>
         <Rail edge="left" order={0}>
