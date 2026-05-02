@@ -43,6 +43,13 @@ p {
   color: var(--stp-foreground-alpha-primary);
 }
 
+blockquote {
+  border-left: 4px solid var(--stp-foreground-alpha-primary);
+  padding-left: 1rem;
+  color: var(--stp-foreground-alpha-primary);
+  font-style: italic;
+}
+
 .close {
   position: absolute;
   top: 0.5rem;
