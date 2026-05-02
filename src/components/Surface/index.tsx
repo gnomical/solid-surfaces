@@ -47,7 +47,7 @@ export function Surface(props: SurfaceProps) {
       }
     }
     return {
-      "grid-area": `ss-${props.edge}-${props.order ?? 0}`,
+      "grid-area": `ss-${props.edge}-${props.order ?? 0}-${handle.id.replace("ss-surface-", "").slice(0, 8)}`,
       ...props.style,
     }
   }

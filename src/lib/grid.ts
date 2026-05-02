@@ -51,6 +51,9 @@ export function resolveCorner(
   return hSurface?.edge ?? "top"
 }
 
+const areaName = (s: RegisteredSurface) =>
+  `ss-${s.edge}-${s.order}-${s.id.replace("ss-surface-", "").slice(0, 8)}`
+
 export function buildGridLayout(
   surfaces: RegisteredSurface[],
   axisPriority: AxisPriority | undefined,
@@ -81,19 +84,19 @@ export function buildGridLayout(
   matrix[topCount][leftCount] = "ss-body"
 
   leftSurfaces.forEach((s, k) => {
-    matrix[topCount][k] = `ss-left-${s.order}`
+    matrix[topCount][k] = areaName(s)
   })
 
   rightSurfaces.forEach((s, k) => {
-    matrix[topCount][leftCount + 1 + (rightCount - 1 - k)] = `ss-right-${s.order}`
+    matrix[topCount][leftCount + 1 + (rightCount - 1 - k)] = areaName(s)
   })
 
   topSurfaces.forEach((s, k) => {
-    matrix[k][leftCount] = `ss-top-${s.order}`
+    matrix[k][leftCount] = areaName(s)
   })
 
   bottomSurfaces.forEach((s, k) => {
-    matrix[topCount + 1 + (bottomCount - 1 - k)][leftCount] = `ss-bottom-${s.order}`
+    matrix[topCount + 1 + (bottomCount - 1 - k)][leftCount] = areaName(s)
   })
 
   for (let r = 0; r < topCount; r++) {
@@ -103,7 +106,7 @@ export function buildGridLayout(
       const override = r === 0 && c === 0 ? corners?.topLeft : undefined
       const winner = resolveCorner(hSurface, vSurface, axisPriority, override)
       const winnerSurface = winner === hSurface?.edge ? hSurface : vSurface
-      matrix[r][c] = winnerSurface ? `ss-${winnerSurface.edge}-${winnerSurface.order}` : "."
+      matrix[r][c] = winnerSurface ? areaName(winnerSurface) : "."
     }
   }
 
@@ -115,7 +118,7 @@ export function buildGridLayout(
       const override = r === 0 && c === cols - 1 ? corners?.topRight : undefined
       const winner = resolveCorner(hSurface, vSurface, axisPriority, override)
       const winnerSurface = winner === hSurface?.edge ? hSurface : vSurface
-      matrix[r][c] = winnerSurface ? `ss-${winnerSurface.edge}-${winnerSurface.order}` : "."
+      matrix[r][c] = winnerSurface ? areaName(winnerSurface) : "."
     }
   }
 
@@ -127,7 +130,7 @@ export function buildGridLayout(
       const override = r === rows - 1 && c === 0 ? corners?.bottomLeft : undefined
       const winner = resolveCorner(hSurface, vSurface, axisPriority, override)
       const winnerSurface = winner === hSurface?.edge ? hSurface : vSurface
-      matrix[r][c] = winnerSurface ? `ss-${winnerSurface.edge}-${winnerSurface.order}` : "."
+      matrix[r][c] = winnerSurface ? areaName(winnerSurface) : "."
     }
   }
 
@@ -140,7 +143,7 @@ export function buildGridLayout(
       const override = r === rows - 1 && c === cols - 1 ? corners?.bottomRight : undefined
       const winner = resolveCorner(hSurface, vSurface, axisPriority, override)
       const winnerSurface = winner === hSurface?.edge ? hSurface : vSurface
-      matrix[r][c] = winnerSurface ? `ss-${winnerSurface.edge}-${winnerSurface.order}` : "."
+      matrix[r][c] = winnerSurface ? areaName(winnerSurface) : "."
     }
   }
 
