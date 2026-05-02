@@ -23,7 +23,7 @@ export function Surface(props: SurfaceProps) {
   // Reactively sync controlled visibility prop.
   // When animate is on, the SlideController intercepts (see onMount).
   createEffect(() => {
-    if (props.visibility !== undefined && !props.animate) {
+    if (props.visibility !== undefined && props.animate === false) {
       handle.setVisibility(props.visibility)
     }
   })
@@ -78,7 +78,7 @@ export function Surface(props: SurfaceProps) {
     ro.observe(target, { box: "border-box" })
     onCleanup(() => ro.disconnect())
 
-    if (!props.animate) return
+    if (props.animate === false) return
 
     // ── Slide animation ────────────────────────────────────────────────────────
 
@@ -106,16 +106,13 @@ export function Surface(props: SurfaceProps) {
 
     onCleanup(() => ctrl.disconnect())
 
-    // desiredVisibility tracks what the caller wants, independently of the
-    // in-flight animation state, so we can detect external changes.
-    let desiredVisibility = handle.visibility()
-
-    // Intercept the controlled-prop path when animate is on
+    // Intercept the controlled-prop path for animation.
+    // External callers (RailController scroll-toward, pointer-proximity, responsive)
+    // drive their own transitions and are not intercepted — they snap normally.
     createEffect(() => {
       if (props.visibility === undefined) return
       const next = props.visibility
-      if (next === desiredVisibility) return
-      desiredVisibility = next
+      if (next === handle.visibility()) return
       if (next === "visible") {
         // Pin track to 0 before making visible so it grows from nothing, not actualSize
         updateSurface(handle.id, { reservedSize: "0px" })
@@ -125,27 +122,6 @@ export function Surface(props: SurfaceProps) {
         ctrl.hide()
       }
     })
-
-    // Intercept external callers (e.g. RailController via handle.setVisibility).
-    // When handle.visibility() flips to "hidden" from outside, reverse it and animate.
-    createEffect((prevV: typeof desiredVisibility | undefined) => {
-      const nextV = handle.visibility()
-      if (prevV === undefined) return nextV
-
-      if (nextV !== desiredVisibility) {
-        desiredVisibility = nextV
-        if (nextV === "visible") {
-          updateSurface(handle.id, { reservedSize: "0px" })
-          ctrl.show()
-        } else {
-          // Restore to visible so the animation can play, then controller hides when done
-          updateSurface(handle.id, { reservedSize: "0px" })
-          handle.setVisibility("visible")
-          ctrl.hide()
-        }
-      }
-      return nextV
-    }, handle.visibility())
   })
 
   return (

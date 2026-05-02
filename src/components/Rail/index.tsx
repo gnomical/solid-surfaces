@@ -39,6 +39,7 @@ export function Rail(props: RailProps) {
       reveal: reveal(),
       responsive: props.responsive ?? false,
       breakpoint: breakpoint(),
+      animate: props.animate !== false,
       getScrollContainer: () => scrollContainer(),
       getActualSize: () => parseFloat(handle.actualSize()) || 0,
       onVisibilityChange: (v) => {

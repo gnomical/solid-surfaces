@@ -94,15 +94,13 @@ Rails also support responsive switching: above a configurable `breakpoint` the r
 </Rail>
 ```
 
-Add `animate` to slide the rail in and out from its docked edge rather than snapping. The grid track grows and shrinks in sync with the content.
+Rails animate by default — the grid track grows and shrinks in sync with the content sliding in or out. Pass `animate={false}` to disable the built-in animation and bring your own transition.
 
 ```tsx
-<Rail edge="left" animate visibility={open() ? "visible" : "hidden"}>
+<Rail edge="left" animate={false} visibility={open() ? "visible" : "hidden"}>
   <nav style={{ width: "220px" }}>Sidebar</nav>
 </Rail>
 ```
-
-> Note: `animate` is not compatible with `reveal="scroll-toward"`, which drives its own continuous transform.
 
 **Sizing:** Rails measure their content via ResizeObserver and use that to drive the grid track. Size your content element with CSS — no `size` prop required or accepted.
 
@@ -120,10 +118,10 @@ A transient surface that floats above the layout, controlled by an `open` prop. 
 </Overlay>
 ```
 
-Add `animate` to slide the overlay in from its edge instead of snapping:
+Overlays animate by default. Pass `animate={false}` to disable the built-in animation and bring your own transition.
 
 ```tsx
-<Overlay edge="bottom" open={open()} animate>
+<Overlay edge="bottom" open={open()} animate={false}>
   <div style={{ height: "200px" }}>Tray content</div>
 </Overlay>
 ```
@@ -190,7 +188,7 @@ Currently exploring core concepts. Not ready for production use.
 - [x] Layout engine (LayoutRoot + LayoutContext)
 - [x] Rail primitive with scroll-toward, pointer-proximity, and responsive behaviors
 - [x] Overlay primitive
-- [x] Slide-in/out animation (`animate` prop on Rail and Overlay)
+- [x] Slide-in/out animation (on by default; `animate={false}` to disable)
 - [x] Body primitive
 - [x] Low-level `createSurface` escape hatch
 - [ ] Dedicated Header primitive

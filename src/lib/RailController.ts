@@ -6,6 +6,7 @@ export type RailControllerOptions = {
   reveal: Reveal
   responsive: boolean
   breakpoint: number
+  animate: boolean
   getScrollContainer: () => HTMLElement | null
   getActualSize: () => number
   onVisibilityChange: (v: Visibility) => void
@@ -104,6 +105,11 @@ export class RailController {
 
   private snapTo(target: number): void {
     if (this.rafId !== null) cancelAnimationFrame(this.rafId)
+    if (!this.opts.animate) {
+      this.virtualPos = target
+      this.commit()
+      return
+    }
     const step = () => {
       const diff = target - this.virtualPos
       if (Math.abs(diff) <= 1) {
@@ -120,6 +126,7 @@ export class RailController {
   }
 
   private onScrollEnd = (): void => {
+    if (!this.opts.animate) return
     const railPx = this.opts.getActualSize()
     if (this.virtualPos === 0 || this.virtualPos === railPx) return
     this.snapTo(this.lastDelta > 0 ? railPx : 0)
@@ -146,11 +153,30 @@ export class RailController {
 
   private makeScrollHandler(container: HTMLElement) {
     return () => {
-      if (this.rafId !== null) { cancelAnimationFrame(this.rafId); this.rafId = null }
       const scrollPos =
         this.opts.edge === "left" || this.opts.edge === "right"
           ? container.scrollLeft
           : container.scrollTop
+
+      if (!this.opts.animate) {
+        // No animation: snap visibility based on scroll direction; always show at the top
+        const delta = scrollPos - this.lastScrollPos
+        this.lastScrollPos = scrollPos
+        if (delta !== 0) {
+          this.lastDelta = delta
+          const horizontal = this.opts.edge === "left" || this.opts.edge === "right"
+          const atTop = scrollPos <= 0
+          const atBottom = horizontal
+            ? scrollPos >= container.scrollWidth - container.clientWidth - 1
+            : scrollPos >= container.scrollHeight - container.clientHeight - 1
+          const next = (atTop || (!atBottom && delta < 0)) ? "visible" : "hidden"
+          this.opts.onVisibilityChange(next)
+          this.opts.onReservedSizeChange(next === "hidden" ? "0px" : undefined)
+        }
+        return
+      }
+
+      if (this.rafId !== null) { cancelAnimationFrame(this.rafId); this.rafId = null }
       this.syncScroll(scrollPos, container)
     }
   }
