@@ -44,7 +44,7 @@ export class SlideController {
     if (this.offsetFraction >= 1) {
       // Already fully hidden
       this.opts.onVisibilityChange("hidden")
-      this.opts.onReservedSizeChange(undefined)
+      this.opts.onReservedSizeChange("0px")
       this.opts.onTransformChange(null)
       return
     }
@@ -91,9 +91,11 @@ export class SlideController {
   private settle(): void {
     if (this.target === "hidden") {
       this.opts.onVisibilityChange("hidden")
-      this.opts.onReservedSizeChange(undefined)
+      // Keep reservedSize at "0px" — clearing it would revert to actualSize and cause a snap
+      this.opts.onReservedSizeChange("0px")
       this.opts.onTransformChange(null)
     } else {
+      // Clear reservedSize so the track reverts to being driven by actualSize normally
       this.opts.onReservedSizeChange(undefined)
       this.opts.onTransformChange(null)
     }
