@@ -51,8 +51,8 @@ export function resolveCorner(
   return hSurface?.edge ?? "top"
 }
 
-const areaName = (s: RegisteredSurface) =>
-  `ss-${s.edge}-${s.order}-${s.id.replace("ss-surface-", "").slice(0, 8)}`
+export const areaName = (s: Pick<RegisteredSurface, "id" | "edge" | "order">) =>
+  `ss-${s.edge}-${s.order}-${s.id.replace("ss-surface-", "").slice(0, 6)}`
 
 export function buildGridLayout(
   surfaces: RegisteredSurface[],

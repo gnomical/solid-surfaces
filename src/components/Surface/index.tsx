@@ -1,5 +1,6 @@
 import { createEffect, onCleanup, onMount, JSX } from "solid-js"
 import { createSurface, useLayout } from "../../context/LayoutContext"
+import { areaName } from "../../lib/grid"
 import type { SurfaceProps } from "../../lib/solid-types"
 import styles from "./Surface.module.css"
 
@@ -47,7 +48,7 @@ export function Surface(props: SurfaceProps) {
       }
     }
     return {
-      "grid-area": `ss-${props.edge}-${props.order ?? 0}-${handle.id.replace("ss-surface-", "").slice(0, 8)}`,
+      "grid-area": areaName({ id: handle.id, edge: props.edge, order: props.order ?? 0 }),
       ...props.style,
     }
   }
