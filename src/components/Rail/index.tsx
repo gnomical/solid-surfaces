@@ -73,10 +73,12 @@ export function Rail(props: RailProps) {
       overlay={overlayMode()}
       occupancy={occupancy()}
       reveal={reveal()}
+      visibility={props.visibility}
       order={props.order ?? 0}
       span={props.span}
       zIndex={10}
       surfaceType="rail"
+      animate={props.animate}
       class={props.class}
       style={scrollStyle()}
     >

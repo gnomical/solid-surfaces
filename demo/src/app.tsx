@@ -16,6 +16,7 @@ export default function App() {
   const [overlayOpen, setOverlayOpen] = createSignal(false)
   const [axisPriority, setAxisPriority] = createSignal<AxisPriority>("horizontal")
   const [overlaySpanInset, setOverlaySpanInset] = createSignal(false)
+  const [navVisible, setNavVisible] = createSignal(true)
 
   return (
     <LayoutRoot class="root" axisPriority={axisPriority()}>
@@ -43,7 +44,7 @@ export default function App() {
       </Rail>
 
       {/* Left rail (order=1) — file tree, inset from the icon bar */}
-      <Rail edge="left" order={1} responsive breakpoint={768}>
+      <Rail edge="left" order={1} responsive breakpoint={768} animate visibility={navVisible() ? "visible" : "hidden"}>
         <nav class="surface vertical nav">
           <span>Nav item 1</span>
           <span>Nav item 2</span>
@@ -77,6 +78,14 @@ export default function App() {
                 onChange={(e) => setOverlaySpanInset(e.currentTarget.checked)}
               />
               {" "}Overlay span="inset" (bounded by top rail)
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={navVisible()}
+                onChange={(e) => setNavVisible(e.currentTarget.checked)}
+              />
+              {" "}Nav rail visible (animate)
             </label>
           </div>
 

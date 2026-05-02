@@ -1,11 +1,12 @@
 import { createEffect, onCleanup, onMount, JSX } from "solid-js"
 import { createSurface, useLayout } from "../../context/LayoutContext"
+import { SlideController } from "../../lib/SlideController"
 import { areaName } from "../../lib/grid"
 import type { SurfaceProps } from "../../lib/solid-types"
 import styles from "./Surface.module.css"
 
 export function Surface(props: SurfaceProps) {
-  const { gridStructure } = useLayout()
+  const { gridStructure, updateSurface } = useLayout()
 
   const handle = createSurface({
     edge: props.edge,
@@ -19,9 +20,12 @@ export function Surface(props: SurfaceProps) {
   // Deliver handle synchronously so callers can wire effects against it
   props.ref?.(handle)
 
-  // Reactively sync controlled visibility prop
+  // Reactively sync controlled visibility prop.
+  // When animate is on, the SlideController intercepts (see onMount).
   createEffect(() => {
-    if (props.visibility !== undefined) handle.setVisibility(props.visibility)
+    if (props.visibility !== undefined && !props.animate) {
+      handle.setVisibility(props.visibility)
+    }
   })
 
   const isHidden = () => handle.visibility() === "hidden"
@@ -73,6 +77,75 @@ export function Surface(props: SurfaceProps) {
     })
     ro.observe(target, { box: "border-box" })
     onCleanup(() => ro.disconnect())
+
+    if (!props.animate) return
+
+    // ── Slide animation ────────────────────────────────────────────────────────
+
+    const child = surfaceEl.firstElementChild as HTMLElement | null
+
+    const applyTransform = (offset: number | null) => {
+      if (!child) return
+      if (offset === null || offset === 0) {
+        child.style.transform = ""
+        return
+      }
+      const translateAxis = props.edge === "left" || props.edge === "right" ? "X" : "Y"
+      // Slide toward the docked edge: left/top slide negative, right/bottom slide positive
+      const sign = props.edge === "left" || props.edge === "top" ? -1 : 1
+      child.style.transform = `translate${translateAxis}(${sign * offset}px)`
+    }
+
+    const ctrl = new SlideController({
+      edge: props.edge,
+      getActualSize: () => parseFloat(handle.actualSize()) || 0,
+      onReservedSizeChange: (size) => updateSurface(handle.id, { reservedSize: size }),
+      onVisibilityChange: (v) => handle.setVisibility(v),
+      onTransformChange: applyTransform,
+    }, handle.visibility())
+
+    onCleanup(() => ctrl.disconnect())
+
+    // desiredVisibility tracks what the caller wants, independently of the
+    // in-flight animation state, so we can detect external changes.
+    let desiredVisibility = handle.visibility()
+
+    // Intercept the controlled-prop path when animate is on
+    createEffect(() => {
+      if (props.visibility === undefined) return
+      const next = props.visibility
+      if (next === desiredVisibility) return
+      desiredVisibility = next
+      if (next === "visible") {
+        // Pin track to 0 before making visible so it grows from nothing, not actualSize
+        updateSurface(handle.id, { reservedSize: "0px" })
+        handle.setVisibility("visible")
+        ctrl.show()
+      } else {
+        ctrl.hide()
+      }
+    })
+
+    // Intercept external callers (e.g. RailController via handle.setVisibility).
+    // When handle.visibility() flips to "hidden" from outside, reverse it and animate.
+    createEffect((prevV: typeof desiredVisibility | undefined) => {
+      const nextV = handle.visibility()
+      if (prevV === undefined) return nextV
+
+      if (nextV !== desiredVisibility) {
+        desiredVisibility = nextV
+        if (nextV === "visible") {
+          updateSurface(handle.id, { reservedSize: "0px" })
+          ctrl.show()
+        } else {
+          // Restore to visible so the animation can play, then controller hides when done
+          updateSurface(handle.id, { reservedSize: "0px" })
+          handle.setVisibility("visible")
+          ctrl.hide()
+        }
+      }
+      return nextV
+    }, handle.visibility())
   })
 
   return (

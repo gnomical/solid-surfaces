@@ -1,0 +1,101 @@
+import type { Edge, Visibility } from "./types"
+
+export type SlideControllerOptions = {
+  edge: Edge
+  getActualSize: () => number
+  onReservedSizeChange: (size: string | undefined) => void
+  onVisibilityChange: (v: Visibility) => void
+  onTransformChange: (offset: number | null) => void
+}
+
+/**
+ * Drives a slide-in/out animation by easing virtualOffset (0 = fully visible,
+ * actualSize = fully hidden) each RAF tick, simultaneously shrinking/growing
+ * the grid track via reservedSize and translating the surface child.
+ *
+ * Mirrors RailController's scroll-toward mechanism.
+ */
+export class SlideController {
+  private opts: SlideControllerOptions
+  // Fraction of actualSize we are offset from the visible position (0 = visible, 1 = hidden).
+  // Stored as a fraction so it remains valid when actualSize changes (e.g. window resize).
+  private offsetFraction = 0
+  private rafId: number | null = null
+  private target: "visible" | "hidden" = "visible"
+
+  constructor(opts: SlideControllerOptions, initialVisibility: "visible" | "hidden" = "visible") {
+    this.opts = opts
+    if (initialVisibility === "hidden") this.offsetFraction = 1
+  }
+
+  show(): void {
+    this.target = "visible"
+    if (this.offsetFraction === 0) {
+      // Already fully visible
+      this.opts.onReservedSizeChange(undefined)
+      this.opts.onTransformChange(null)
+      return
+    }
+    this.startRaf()
+  }
+
+  hide(): void {
+    this.target = "hidden"
+    if (this.offsetFraction >= 1) {
+      // Already fully hidden
+      this.opts.onVisibilityChange("hidden")
+      this.opts.onReservedSizeChange(undefined)
+      this.opts.onTransformChange(null)
+      return
+    }
+    this.startRaf()
+  }
+
+  disconnect(): void {
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId)
+      this.rafId = null
+    }
+  }
+
+  private startRaf(): void {
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId)
+    const targetFraction = this.target === "hidden" ? 1 : 0
+    const step = () => {
+      const diff = targetFraction - this.offsetFraction
+
+      if (Math.abs(diff) <= 0.005) {
+        this.offsetFraction = targetFraction
+        this.commitFraction()
+        this.settle()
+        this.rafId = null
+        return
+      }
+
+      this.offsetFraction += diff * 0.2
+      this.commitFraction()
+      this.rafId = requestAnimationFrame(step)
+    }
+    this.rafId = requestAnimationFrame(step)
+  }
+
+  private commitFraction(): void {
+    const actualSize = this.opts.getActualSize()
+    const offset = this.offsetFraction * actualSize
+    // reservedSize tracks the visible portion of the slot
+    const reservedSize = Math.max(0, actualSize - offset)
+    this.opts.onReservedSizeChange(`${reservedSize}px`)
+    this.opts.onTransformChange(offset)
+  }
+
+  private settle(): void {
+    if (this.target === "hidden") {
+      this.opts.onVisibilityChange("hidden")
+      this.opts.onReservedSizeChange(undefined)
+      this.opts.onTransformChange(null)
+    } else {
+      this.opts.onReservedSizeChange(undefined)
+      this.opts.onTransformChange(null)
+    }
+  }
+}

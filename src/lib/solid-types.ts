@@ -69,6 +69,10 @@ export type RailProps = {
    * "inset" = yield them to crossing surfaces.
    */
   span?: Span
+  /** When true, surfaces slide in/out from their docked edge on visibility transitions. */
+  animate?: boolean
+  /** Controlled visibility — overrides reveal/responsive behavior when set. */
+  visibility?: Visibility
   class?: string
   style?: JSX.CSSProperties
 }
@@ -84,6 +88,8 @@ export type OverlayProps = {
    * "inset" = bounded by crossing-axis rail tracks.
    */
   span?: Span
+  /** When true, surfaces slide in/out from their docked edge on visibility transitions. */
+  animate?: boolean
   class?: string
   style?: JSX.CSSProperties
 }
@@ -101,6 +107,8 @@ export type SurfaceProps = {
   zIndex?: number
   /** Value for data-ss-surface attribute. Default: "surface" */
   surfaceType?: string
+  /** When true, surfaces slide in/out from their docked edge on visibility transitions. */
+  animate?: boolean
   children?: JSX.Element
   class?: string
   style?: JSX.CSSProperties
