@@ -1,11 +1,12 @@
 import { createEffect, onCleanup, onMount, JSX } from "solid-js"
 import { createSurface, useLayout } from "../../context/LayoutContext"
+import { SlideController } from "../../lib/SlideController"
 import { areaName } from "../../lib/grid"
 import type { SurfaceProps } from "../../lib/solid-types"
 import styles from "./Surface.module.css"
 
 export function Surface(props: SurfaceProps) {
-  const { gridStructure } = useLayout()
+  const { gridStructure, updateSurface } = useLayout()
 
   const handle = createSurface({
     edge: props.edge,
@@ -19,9 +20,12 @@ export function Surface(props: SurfaceProps) {
   // Deliver handle synchronously so callers can wire effects against it
   props.ref?.(handle)
 
-  // Reactively sync controlled visibility prop
+  // Reactively sync controlled visibility prop.
+  // When animate is on, the SlideController intercepts (see onMount).
   createEffect(() => {
-    if (props.visibility !== undefined) handle.setVisibility(props.visibility)
+    if (props.visibility !== undefined && props.animate === false) {
+      handle.setVisibility(props.visibility)
+    }
   })
 
   const isHidden = () => handle.visibility() === "hidden"
@@ -54,16 +58,17 @@ export function Surface(props: SurfaceProps) {
   }
 
   let surfaceEl!: HTMLElement
+  let animWrapperEl!: HTMLDivElement
 
   onMount(() => {
     const axis = props.edge === "left" || props.edge === "right" ? "width" : "height"
     const roAxis = props.edge === "left" || props.edge === "right" ? "inlineSize" : "blockSize"
 
     // For reserved surfaces, the grid cell is sized by the track (which starts at 0px),
-    // so we observe the first child element — the caller's content — which carries the
-    // real CSS size (e.g. width: 220px) independent of the grid track.
+    // so we observe the caller's content element — it carries the real CSS size
+    // (e.g. width: 220px) independent of the grid track.
     // Overlay surfaces are absolutely positioned and size themselves, so we observe them directly.
-    const target = props.overlay ? surfaceEl : (surfaceEl.firstElementChild as HTMLElement | null) ?? surfaceEl
+    const target = props.overlay ? surfaceEl : (animWrapperEl.firstElementChild as HTMLElement | null) ?? surfaceEl
 
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -73,6 +78,54 @@ export function Surface(props: SurfaceProps) {
     })
     ro.observe(target, { box: "border-box" })
     onCleanup(() => ro.disconnect())
+
+    if (props.animate === false) return
+
+    // ── Slide animation ────────────────────────────────────────────────────────
+
+    const applyTransform = (offset: number | null) => {
+      if (offset === null || offset === 0) {
+        animWrapperEl.style.transform = ""
+        return
+      }
+      const translateAxis = props.edge === "left" || props.edge === "right" ? "X" : "Y"
+      // Slide toward the docked edge: left/top slide negative, right/bottom slide positive
+      const sign = props.edge === "left" || props.edge === "top" ? -1 : 1
+      animWrapperEl.style.transform = `translate${translateAxis}(${sign * offset}px)`
+    }
+
+    const ctrl = new SlideController({
+      edge: props.edge,
+      getActualSize: () => parseFloat(handle.actualSize()) || 0,
+      onReservedSizeChange: (size) => updateSurface(handle.id, { reservedSize: size }),
+      onVisibilityChange: (v) => handle.setVisibility(v),
+      onTransformChange: applyTransform,
+    }, handle.visibility())
+
+    onCleanup(() => ctrl.disconnect())
+
+    // Intercept the controlled-prop path for animation.
+    // External callers (RailController scroll-toward, pointer-proximity, responsive)
+    // drive their own transitions and are not intercepted — they snap normally.
+    // Track desired state separately — handle.visibility() stays "visible" during
+    // a hide animation (so the element remains in the DOM), which would fool a naive
+    // comparison and cause the effect to bail out prematurely on rapid toggles.
+    let desired = handle.visibility()
+    createEffect(() => {
+      if (props.visibility === undefined) return
+      const next = props.visibility
+      if (next === desired) return
+      desired = next
+      if (next === "visible") {
+        // Only pin track to 0 when fully at rest hidden — mid-animation the controller
+        // already holds the correct partial reservedSize, resetting it would cause a snap
+        if (ctrl.isAtRest) updateSurface(handle.id, { reservedSize: "0px" })
+        handle.setVisibility("visible")
+        ctrl.show()
+      } else {
+        ctrl.hide()
+      }
+    })
   })
 
   return (
@@ -89,7 +142,9 @@ export function Surface(props: SurfaceProps) {
       data-ss-edge={props.edge}
       data-ss-state={handle.visibility()}
     >
-      {props.children}
+      <div ref={(el) => { animWrapperEl = el; props.animRef?.(el) }}>
+        {props.children}
+      </div>
     </div>
   )
 }

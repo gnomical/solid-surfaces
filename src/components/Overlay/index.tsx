@@ -13,6 +13,7 @@ export function Overlay(props: OverlayProps) {
       span={props.span}
       zIndex={20}
       surfaceType="overlay"
+      animate={props.animate}
       class={props.class}
       style={props.style}
     >

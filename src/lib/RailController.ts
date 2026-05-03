@@ -6,6 +6,8 @@ export type RailControllerOptions = {
   reveal: Reveal
   responsive: boolean
   breakpoint: number
+  animate: boolean
+  getVisibility: () => Visibility
   getScrollContainer: () => HTMLElement | null
   getActualSize: () => number
   onVisibilityChange: (v: Visibility) => void
@@ -16,6 +18,7 @@ export type RailControllerOptions = {
 export class RailController {
   private opts: RailControllerOptions
   private surfaceEl: HTMLElement | null = null
+  private contentEl: HTMLElement | null = null
   private cleanups: Array<() => void> = []
 
   // scroll-toward state
@@ -29,8 +32,9 @@ export class RailController {
     this.opts = opts
   }
 
-  connect(surfaceEl: HTMLElement): void {
+  connect(surfaceEl: HTMLElement, contentEl?: HTMLElement): void {
     this.surfaceEl = surfaceEl
+    this.contentEl = contentEl ?? null
     if (this.opts.responsive) this.setupResponsive()
     if (this.opts.reveal === "scroll-toward") this.setupScrollToward()
     if (this.opts.reveal === "pointer-proximity") this.setupPointerProximity()
@@ -86,9 +90,9 @@ export class RailController {
   }
 
   private applyChildTransform(): void {
-    const child = this.surfaceEl?.firstElementChild as HTMLElement | null
-    if (!child) return
-    child.style.transform =
+    const el = this.contentEl ?? (this.surfaceEl?.firstElementChild as HTMLElement | null)
+    if (!el) return
+    el.style.transform =
       this.virtualPos > 0
         ? `translate${this.translateAxis}(${this.translateSign * this.virtualPos}px)`
         : ""
@@ -104,6 +108,11 @@ export class RailController {
 
   private snapTo(target: number): void {
     if (this.rafId !== null) cancelAnimationFrame(this.rafId)
+    if (!this.opts.animate) {
+      this.virtualPos = target
+      this.commit()
+      return
+    }
     const step = () => {
       const diff = target - this.virtualPos
       if (Math.abs(diff) <= 1) {
@@ -120,12 +129,14 @@ export class RailController {
   }
 
   private onScrollEnd = (): void => {
+    if (!this.opts.animate) return
     const railPx = this.opts.getActualSize()
     if (this.virtualPos === 0 || this.virtualPos === railPx) return
     this.snapTo(this.lastDelta > 0 ? railPx : 0)
   }
 
   private syncScroll(scrollPos: number, el: HTMLElement): void {
+    if (this.opts.getVisibility() === "hidden") return
     const railPx = this.opts.getActualSize()
     const delta = scrollPos - this.lastScrollPos
     if (delta !== 0) this.lastDelta = delta
@@ -146,11 +157,31 @@ export class RailController {
 
   private makeScrollHandler(container: HTMLElement) {
     return () => {
-      if (this.rafId !== null) { cancelAnimationFrame(this.rafId); this.rafId = null }
       const scrollPos =
         this.opts.edge === "left" || this.opts.edge === "right"
           ? container.scrollLeft
           : container.scrollTop
+
+      if (!this.opts.animate) {
+        if (this.opts.getVisibility() === "hidden") return
+        // No animation: snap visibility based on scroll direction; always show at the top
+        const delta = scrollPos - this.lastScrollPos
+        this.lastScrollPos = scrollPos
+        if (delta !== 0) {
+          this.lastDelta = delta
+          const horizontal = this.opts.edge === "left" || this.opts.edge === "right"
+          const atTop = scrollPos <= 0
+          const atBottom = horizontal
+            ? scrollPos >= container.scrollWidth - container.clientWidth - 1
+            : scrollPos >= container.scrollHeight - container.clientHeight - 1
+          const next = (atTop || (!atBottom && delta < 0)) ? "visible" : "hidden"
+          this.opts.onVisibilityChange(next)
+          this.opts.onReservedSizeChange(next === "hidden" ? "0px" : undefined)
+        }
+        return
+      }
+
+      if (this.rafId !== null) { cancelAnimationFrame(this.rafId); this.rafId = null }
       this.syncScroll(scrollPos, container)
     }
   }
@@ -175,6 +206,7 @@ export class RailController {
         ? container.scrollLeft
         : container.scrollTop
     this.lastScrollPos = scrollPos
+    if (this.opts.getVisibility() === "hidden") return
     this.virtualPos = Math.min(scrollPos, this.opts.getActualSize())
     this.commit()
     this.scrollHandler = this.makeScrollHandler(container)

@@ -26,6 +26,7 @@ export function Rail(props: RailProps) {
 
   let handle!: SurfaceHandle
   let surfaceEl!: HTMLElement
+  let animWrapperEl!: HTMLElement
   let ctrl: RailController
 
   // Sync occupancy changes back to context
@@ -39,6 +40,8 @@ export function Rail(props: RailProps) {
       reveal: reveal(),
       responsive: props.responsive ?? false,
       breakpoint: breakpoint(),
+      animate: props.animate !== false,
+      getVisibility: () => handle.visibility(),
       getScrollContainer: () => scrollContainer(),
       getActualSize: () => parseFloat(handle.actualSize()) || 0,
       onVisibilityChange: (v) => {
@@ -48,7 +51,7 @@ export function Rail(props: RailProps) {
       onOccupancyChange: setOccupancy,
     })
 
-    ctrl.connect(surfaceEl)
+    ctrl.connect(surfaceEl, animWrapperEl)
     onCleanup(() => ctrl.disconnect())
   })
 
@@ -69,14 +72,17 @@ export function Rail(props: RailProps) {
     <Surface
       ref={(h: SurfaceHandle) => { handle = h }}
       domRef={(el: HTMLElement) => { surfaceEl = el }}
+      animRef={(el: HTMLElement) => { animWrapperEl = el }}
       edge={props.edge}
       overlay={overlayMode()}
       occupancy={occupancy()}
       reveal={reveal()}
+      visibility={props.visibility}
       order={props.order ?? 0}
       span={props.span}
       zIndex={10}
       surfaceType="rail"
+      animate={props.animate}
       class={props.class}
       style={scrollStyle()}
     >

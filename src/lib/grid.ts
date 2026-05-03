@@ -16,8 +16,8 @@ export function isReservedActive(s: RegisteredSurface): boolean {
 
 export function trackSize(surface: RegisteredSurface | undefined): string {
   if (!surface) return "0px"
-  if (surface.occupancy === "visible-driven" && surface.visibility === "hidden") return "0px"
   if (surface.occupancy === "none") return "0px"
+  if (surface.visibility === "hidden" && surface.reservedSize === undefined) return "0px"
   return surface.reservedSize ?? surface.actualSize
 }
 
