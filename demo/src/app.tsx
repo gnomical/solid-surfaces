@@ -16,12 +16,12 @@ export default function App() {
   const [overlayOpen, setOverlayOpen] = createSignal(false)
   const [axisPriority, setAxisPriority] = createSignal<AxisPriority>("horizontal")
   const [overlaySpanInset, setOverlaySpanInset] = createSignal(false)
-  const [navVisible, setNavVisible] = createSignal(true)
+  const [navVisible, setNavVisible] = createSignal(false)
 
   return (
     <LayoutRoot class="root" axisPriority={axisPriority()}>
       {/* Top rail — hides on scroll down, reveals on scroll up; span=full claims corners */}
-      <Rail edge="top" reveal="scroll-toward" span="full">
+      <Rail edge="top" reveal="scroll-toward" span="full" visibility={navVisible() ? "visible" : "hidden"} animate>
         <header class="surface horizontal header">
           <span class="brand">solid-surfaces</span>
           <Chip type="Rail" edge="top" reveal="scroll-toward" />

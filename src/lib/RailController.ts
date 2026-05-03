@@ -7,6 +7,7 @@ export type RailControllerOptions = {
   responsive: boolean
   breakpoint: number
   animate: boolean
+  getVisibility: () => Visibility
   getScrollContainer: () => HTMLElement | null
   getActualSize: () => number
   onVisibilityChange: (v: Visibility) => void
@@ -135,6 +136,7 @@ export class RailController {
   }
 
   private syncScroll(scrollPos: number, el: HTMLElement): void {
+    if (this.opts.getVisibility() === "hidden") return
     const railPx = this.opts.getActualSize()
     const delta = scrollPos - this.lastScrollPos
     if (delta !== 0) this.lastDelta = delta
@@ -161,6 +163,7 @@ export class RailController {
           : container.scrollTop
 
       if (!this.opts.animate) {
+        if (this.opts.getVisibility() === "hidden") return
         // No animation: snap visibility based on scroll direction; always show at the top
         const delta = scrollPos - this.lastScrollPos
         this.lastScrollPos = scrollPos
@@ -203,6 +206,7 @@ export class RailController {
         ? container.scrollLeft
         : container.scrollTop
     this.lastScrollPos = scrollPos
+    if (this.opts.getVisibility() === "hidden") return
     this.virtualPos = Math.min(scrollPos, this.opts.getActualSize())
     this.commit()
     this.scrollHandler = this.makeScrollHandler(container)
