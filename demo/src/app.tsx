@@ -42,16 +42,21 @@ export default function App() {
         <Overlay open={true} edge="bottom" span="full"><div class="surface horizontal drawer ghost" style={{height: "220px"}}></div></Overlay>
       </Show>
 
-      <Rail edge="top">
-        <div class="surface horizontal header" classList={{
-          "revealed": headerAdded(),
-        }}>
-          <Show when={headerAdded()}>
-            <span class="brand">Surface Kit</span>
-          </Show>
+      <Rail edge="top" visibility={headerAdded() ? "visible" : "hidden"}>
+        <div class="surface horizontal top header">
+          <span class="brand">Surface Kit</span>
           <ThemeToggle classList={{'theme-toggle': true}}/>
         </div>
       </Rail>
+
+      { /* theme toggle before the demo gets started */}
+      <Show when={!layoutRootActivated()}>
+        <Overlay edge="top" open={true}>
+          <div class="surface horizontal header">
+            <ThemeToggle classList={{'theme-toggle': true}}/>
+          </div>
+        </Overlay>
+      </Show>
 
       <Show when={iconBarAdded()}>
         <Rail edge="left" order={0}>

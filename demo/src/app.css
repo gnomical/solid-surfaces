@@ -77,16 +77,13 @@ blockquote {
 
 .surface {
   height: 100%;
-  background: var(--stp-background);
   box-sizing: border-box;
-  backdrop-filter: blur(12px);
   padding: 0.5rem;
   overflow: auto;
   display: flex;
   gap: 1rem;
   &.ghost {
     --border: var(--border-size) solid var(--stp-foreground-alpha-quaternary);
-    /* border-color: var(--stp-foreground-alpha-quaternary); */
   }
   &.top {
     border-bottom: var(--border);
@@ -121,9 +118,6 @@ blockquote {
 
 .header {
   padding: 1rem 1.5rem;
-  &.revealed {
-    border-bottom: var(--border);
-  }
   .theme-toggle {
     margin-left: auto;
     transform: translateY(-2px); /* half shadow size */
