@@ -38,6 +38,7 @@ export type SurfaceHandle = {
 export type LayoutRootProps = {
   children?: JSX.Element
   class?: string
+  classList?: { [key: string]: boolean }
   style?: JSX.CSSProperties
   /** Which axis owns corner cells when span/corners don't resolve the conflict. Default: "horizontal" */
   axisPriority?: import("./types").AxisPriority

@@ -1,4 +1,4 @@
-import { createSignal, Show } from "solid-js"
+import { createSignal, createEffect, Show } from "solid-js"
 import { LayoutRoot, Overlay, Body, Rail } from "solid-surfaces"
 import "./app.css"
 import { CLOSE_ICON } from "./lib/constants"
@@ -10,10 +10,18 @@ import { RailsSection } from "./sections/rails"
 import { AxisPrioritySection } from "./sections/axis-priority"
 import { StackingSection } from "./sections/stacking"
 
+const ghostSpeed = 200
+
 export default function App() {
   const [step, setStep] = createSignal(0)
   const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
-  const [ghostsActivated, setGhostsActivated] = createSignal(false)
+  const [layoutRootEmphasized, setLayoutRootEmphasized] = createSignal(false)
+  const [layoutRootComplete, setLayoutRootComplete] = createSignal(false)
+  const [ghostIconBar, setGhostIconBar] = createSignal(false)
+  const [ghostNav, setGhostNav] = createSignal(false)
+  const [ghostHeader, setGhostHeader] = createSignal(false)
+  const [ghostRight, setGhostRight] = createSignal(false)
+  const [ghostDrawer, setGhostDrawer] = createSignal(false)
   const [headerAdded, setHeaderAdded] = createSignal(false)
   const [iconBarAdded, setIconBarAdded] = createSignal(false)
   const [navAdded, setNavAdded] = createSignal(false)
@@ -26,23 +34,61 @@ export default function App() {
   let iconBarSection!: HTMLElement
   let navSection!: HTMLElement
 
+  createEffect(() => {
+    if (!layoutRootActivated()) return
+    setTimeout(() => setGhostIconBar(true),   ghostSpeed * 5)
+
+    setTimeout(() => setGhostRight(true),      ghostSpeed * 8)
+    setTimeout(() => setGhostRight(false),      ghostSpeed * 9)
+    setTimeout(() => setGhostHeader(true),     ghostSpeed * 10)
+
+    setTimeout(() => setGhostNav(true),        ghostSpeed * 14)
+    setTimeout(() => setGhostRight(true),      ghostSpeed * 14)
+
+    setTimeout(() => setGhostDrawer(true),     ghostSpeed * 17)
+    setTimeout(() => setGhostDrawer(false),  ghostSpeed * 18)
+
+    setTimeout(() => setGhostRight(false),   ghostSpeed * 20)
+    setTimeout(() => setGhostIconBar(false), ghostSpeed * 20)
+    setTimeout(() => setGhostHeader(false),  ghostSpeed * 20)
+    setTimeout(() => setGhostNav(false),     ghostSpeed * 20)
+    setTimeout(() => setLayoutRootEmphasized(true),  ghostSpeed * 20)
+
+    setTimeout(() => setLayoutRootComplete(true),  ghostSpeed * 22)
+  })
+
   const revealAndScroll = (nextStep: number, getEl: () => HTMLElement) => {
     setStep(nextStep)
     queueMicrotask(() => getEl()?.scrollIntoView({ behavior: "smooth", block: "start" }))
   }
 
   return (
-    <LayoutRoot class={layoutRootActivated() ? "root activated" : "root"} axisPriority={axisPriority()}>
+    <LayoutRoot class="root" axisPriority={axisPriority()} classList={{
+      "activated": layoutRootActivated(),
+      "blink": layoutRootEmphasized(),
+    }}>
 
-      <Show when={ghostsActivated()}>
-        <Rail edge="top"><div class="surface horizontal header ghost"></div></Rail>
-        <Rail edge="left" span="inset"><div class="surface vertical icon-bar ghost"></div></Rail>
-        <Rail edge="left" span="inset"><div class="surface vertical nav ghost"></div></Rail>
-        <Rail edge="right"><div class="surface vertical right ghost" style={{width: "220px"}}></div></Rail>
-        <Overlay open={true} edge="bottom" span="full"><div class="surface horizontal drawer ghost" style={{height: "220px"}}></div></Overlay>
-      </Show>
+      <Rail edge="top" visibility={ghostHeader() ? "visible" : "hidden"}>
+        <div class="surface horizontal top ghost" style={{height: "70px"}}/>
+      </Rail>
 
-      <Rail edge="top" visibility={headerAdded() ? "visible" : "hidden"}>
+      <Rail edge="left" span="inset" visibility={ghostIconBar() ? "visible" : "hidden"}>
+        <div class="surface vertical left ghost" style={{width: "60px"}}/>
+      </Rail>
+
+      <Rail edge="left" span="inset" visibility={ghostNav() ? "visible" : "hidden"}>
+        <div class="surface vertical left ghost" style={{width: "200px"}} />
+      </Rail>
+
+      <Rail edge="right" visibility={ghostRight() ? "visible" : "hidden"}>
+        <div class="surface vertical right ghost" style={{width: "200px"}} />
+      </Rail>
+
+      <Overlay open={ghostDrawer()} edge="bottom" span="full">
+        <div class="surface horizontal drawer ghost" style={{height: "200px"}} />
+      </Overlay>
+
+      <Rail edge="top" visibility={step() >= 2 ? "visible" : "hidden"}>
         <div class="surface horizontal top header">
           <span class="brand">Surface Kit</span>
           <ThemeToggle classList={{'theme-toggle': true}}/>
@@ -51,7 +97,7 @@ export default function App() {
 
       { /* theme toggle before the demo gets started */}
       <Show when={!layoutRootActivated()}>
-        <Overlay edge="top" open={true}>
+        <Overlay edge="top" open={true} span="inset">
           <div class="surface horizontal header">
             <ThemeToggle classList={{'theme-toggle': true}}/>
           </div>
@@ -93,7 +139,7 @@ export default function App() {
             show={step() >= 1}
             layoutRootActivated={layoutRootActivated}
             setLayoutRootActivated={setLayoutRootActivated}
-            onContinue={layoutRootActivated() ? () => revealAndScroll(2, () => railsSection) : undefined}
+            onContinue={layoutRootComplete() ? () => revealAndScroll(2, () => railsSection) : undefined}
           />
 
           <RailsSection

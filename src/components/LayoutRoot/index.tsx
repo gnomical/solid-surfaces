@@ -22,6 +22,7 @@ function LayoutRootInner(props: LayoutRootProps) {
   return (
     <div
       class={`${styles.root}${props.class ? ` ${props.class}` : ""}`}
+      classList={props.classList}
       style={gridStyle()}
     >
       {props.children}
