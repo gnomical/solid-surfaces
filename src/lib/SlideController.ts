@@ -28,6 +28,10 @@ export class SlideController {
     if (initialVisibility === "hidden") this.offsetFraction = 1
   }
 
+  get isAtRest(): boolean {
+    return this.rafId === null
+  }
+
   show(): void {
     this.target = "visible"
     if (this.offsetFraction === 0) {

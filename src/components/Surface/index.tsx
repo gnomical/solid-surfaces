@@ -109,13 +109,19 @@ export function Surface(props: SurfaceProps) {
     // Intercept the controlled-prop path for animation.
     // External callers (RailController scroll-toward, pointer-proximity, responsive)
     // drive their own transitions and are not intercepted — they snap normally.
+    // Track desired state separately — handle.visibility() stays "visible" during
+    // a hide animation (so the element remains in the DOM), which would fool a naive
+    // comparison and cause the effect to bail out prematurely on rapid toggles.
+    let desired = handle.visibility()
     createEffect(() => {
       if (props.visibility === undefined) return
       const next = props.visibility
-      if (next === handle.visibility()) return
+      if (next === desired) return
+      desired = next
       if (next === "visible") {
-        // Pin track to 0 before making visible so it grows from nothing, not actualSize
-        updateSurface(handle.id, { reservedSize: "0px" })
+        // Only pin track to 0 when fully at rest hidden — mid-animation the controller
+        // already holds the correct partial reservedSize, resetting it would cause a snap
+        if (ctrl.isAtRest) updateSurface(handle.id, { reservedSize: "0px" })
         handle.setVisibility("visible")
         ctrl.show()
       } else {
