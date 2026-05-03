@@ -116,4 +116,6 @@ export type SurfaceProps = {
   ref?: (handle: SurfaceHandle) => void
   /** Callback that receives the root DOM element after mount */
   domRef?: (el: HTMLElement) => void
+  /** Callback that receives the internal animation wrapper element after mount */
+  animRef?: (el: HTMLElement) => void
 }

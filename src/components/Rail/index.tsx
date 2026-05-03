@@ -26,6 +26,7 @@ export function Rail(props: RailProps) {
 
   let handle!: SurfaceHandle
   let surfaceEl!: HTMLElement
+  let animWrapperEl!: HTMLElement
   let ctrl: RailController
 
   // Sync occupancy changes back to context
@@ -49,7 +50,7 @@ export function Rail(props: RailProps) {
       onOccupancyChange: setOccupancy,
     })
 
-    ctrl.connect(surfaceEl)
+    ctrl.connect(surfaceEl, animWrapperEl)
     onCleanup(() => ctrl.disconnect())
   })
 
@@ -70,6 +71,7 @@ export function Rail(props: RailProps) {
     <Surface
       ref={(h: SurfaceHandle) => { handle = h }}
       domRef={(el: HTMLElement) => { surfaceEl = el }}
+      animRef={(el: HTMLElement) => { animWrapperEl = el }}
       edge={props.edge}
       overlay={overlayMode()}
       occupancy={occupancy()}

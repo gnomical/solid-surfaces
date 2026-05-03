@@ -17,6 +17,7 @@ export type RailControllerOptions = {
 export class RailController {
   private opts: RailControllerOptions
   private surfaceEl: HTMLElement | null = null
+  private contentEl: HTMLElement | null = null
   private cleanups: Array<() => void> = []
 
   // scroll-toward state
@@ -30,8 +31,9 @@ export class RailController {
     this.opts = opts
   }
 
-  connect(surfaceEl: HTMLElement): void {
+  connect(surfaceEl: HTMLElement, contentEl?: HTMLElement): void {
     this.surfaceEl = surfaceEl
+    this.contentEl = contentEl ?? null
     if (this.opts.responsive) this.setupResponsive()
     if (this.opts.reveal === "scroll-toward") this.setupScrollToward()
     if (this.opts.reveal === "pointer-proximity") this.setupPointerProximity()
@@ -87,9 +89,9 @@ export class RailController {
   }
 
   private applyChildTransform(): void {
-    const child = this.surfaceEl?.firstElementChild as HTMLElement | null
-    if (!child) return
-    child.style.transform =
+    const el = this.contentEl ?? (this.surfaceEl?.firstElementChild as HTMLElement | null)
+    if (!el) return
+    el.style.transform =
       this.virtualPos > 0
         ? `translate${this.translateAxis}(${this.translateSign * this.virtualPos}px)`
         : ""

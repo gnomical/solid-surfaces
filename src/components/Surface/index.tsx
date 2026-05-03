@@ -58,16 +58,17 @@ export function Surface(props: SurfaceProps) {
   }
 
   let surfaceEl!: HTMLElement
+  let animWrapperEl!: HTMLDivElement
 
   onMount(() => {
     const axis = props.edge === "left" || props.edge === "right" ? "width" : "height"
     const roAxis = props.edge === "left" || props.edge === "right" ? "inlineSize" : "blockSize"
 
     // For reserved surfaces, the grid cell is sized by the track (which starts at 0px),
-    // so we observe the first child element — the caller's content — which carries the
-    // real CSS size (e.g. width: 220px) independent of the grid track.
+    // so we observe the caller's content element — it carries the real CSS size
+    // (e.g. width: 220px) independent of the grid track.
     // Overlay surfaces are absolutely positioned and size themselves, so we observe them directly.
-    const target = props.overlay ? surfaceEl : (surfaceEl.firstElementChild as HTMLElement | null) ?? surfaceEl
+    const target = props.overlay ? surfaceEl : (animWrapperEl.firstElementChild as HTMLElement | null) ?? surfaceEl
 
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -82,18 +83,15 @@ export function Surface(props: SurfaceProps) {
 
     // ── Slide animation ────────────────────────────────────────────────────────
 
-    const child = surfaceEl.firstElementChild as HTMLElement | null
-
     const applyTransform = (offset: number | null) => {
-      if (!child) return
       if (offset === null || offset === 0) {
-        child.style.transform = ""
+        animWrapperEl.style.transform = ""
         return
       }
       const translateAxis = props.edge === "left" || props.edge === "right" ? "X" : "Y"
       // Slide toward the docked edge: left/top slide negative, right/bottom slide positive
       const sign = props.edge === "left" || props.edge === "top" ? -1 : 1
-      child.style.transform = `translate${translateAxis}(${sign * offset}px)`
+      animWrapperEl.style.transform = `translate${translateAxis}(${sign * offset}px)`
     }
 
     const ctrl = new SlideController({
@@ -144,7 +142,9 @@ export function Surface(props: SurfaceProps) {
       data-ss-edge={props.edge}
       data-ss-state={handle.visibility()}
     >
-      {props.children}
+      <div ref={(el) => { animWrapperEl = el; props.animRef?.(el) }}>
+        {props.children}
+      </div>
     </div>
   )
 }
