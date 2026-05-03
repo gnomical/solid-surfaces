@@ -1,3 +1,7 @@
+## Next
+- update demo to use visibility instead of Show to leverage slide animations
+
+## Others
 - Surface only syncs the controlled visibility prop back into the registered descriptor. If callers change occupancy, size, order, reveal, or edge after mount, the layout context will keep stale values and grid computation can be wrong. Consider adding effects to update the descriptor when these props change (or explicitly document that they are immutable after mount).
 - Surface only re-syncs a controlled visibility prop after mount. Other props that affect layout (edge, occupancy, order, span, reveal, and even overlay→occupancy) are captured once in createSurface and then never pushed back to the context if they change, which can leave LayoutRoot computing grid geometry from stale descriptors. Consider adding reactive effects to update the registered descriptor for these props, or documenting/enforcing that they are immutable after mount.
 - For non-overlay (reserved) surfaces, measurement is taken from surfaceEl.firstElementChild. If a caller passes only text nodes / fragments (so firstElementChild is null), the fallback observes surfaceEl itself—which will start at a 0px grid track and may never produce a non-zero measurement, leaving the track stuck at 0px. Consider enforcing/wrapping children in a measurable element for reserved surfaces, or switching to a measurement strategy that works even when there is no element child (e.g., require a single root element in docs and throw/warn otherwise).

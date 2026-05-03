@@ -56,13 +56,6 @@ blockquote {
   right: 0.5rem;
 }
 
-.theme-toggle {
-  position: absolute;
-  top: 0.75rem;
-  right: 1.5rem;
-  z-index: 2;
-}
-
 @keyframes border-blink {
   50% { border-color: var(--stp-shadow); }
 }
@@ -121,19 +114,19 @@ blockquote {
 .drawer {
   height: 200px;
   border: var(--border);
-  /* border-radius: 1rem; */
   margin: 0 1rem 1rem;
   background: var(--stp-background-alpha-secondary);
   box-shadow: 6px 6px 0 var(--stp-foreground-alpha-tertiary);
 }
 
 .header {
-  min-height: 3rem;
-  border-radius: 1rem 1rem 0 0;
-  /* border-bottom: var(--border); */
-  padding: 2rem;
+  padding: 1rem 1.5rem;
   &.revealed {
     border-bottom: var(--border);
+  }
+  .theme-toggle {
+    margin-left: auto;
+    transform: translateY(-2px); /* half shadow size */
   }
 }
 
@@ -141,14 +134,12 @@ blockquote {
   width: 220px;
   height: calc(100% + var(--border-size));
   transform: translateY(calc(-1 * var(--border-size)));
-  border-right: var(--border);
   padding: 1rem;
 }
 
 .icon-bar {
   align-items: center;
-  padding: 1rem 2rem;
-  border-right: var(--border);
+  padding: 1rem;
 }
 
 .nav-item {

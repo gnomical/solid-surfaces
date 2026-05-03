@@ -55,7 +55,7 @@ export default function App() {
 
       <Show when={iconBarAdded()}>
         <Rail edge="left" order={0}>
-          <div class="surface vertical icon-bar">
+          <div class="surface vertical left icon-bar">
             <Button size="sm" variant="secondary"></Button>
             <Button size="sm" variant="secondary"></Button>
             <Button size="sm" variant="secondary"></Button>
@@ -66,7 +66,7 @@ export default function App() {
 
       <Show when={navAdded()}>
         <Rail edge="left" order={1} span={navSpan()}>
-          <div class="surface vertical nav">
+          <div class="surface vertical left nav">
             <span class="brand">Nav</span>
             <div class="nav-item"><span class="nav-icon">⌂</span><span>Home</span></div>
             <div class="nav-item"><span class="nav-icon">◫</span><span>Layout</span></div>
