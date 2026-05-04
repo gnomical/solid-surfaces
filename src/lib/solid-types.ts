@@ -96,7 +96,7 @@ export type OverlayProps = {
 
 export type SurfaceProps = {
   edge: Edge
-  /** Whether to render as overlay (absolute) vs reserved (grid-area). Default: false */
+  /** Whether to render as an overlay grid item (self-aligned, non-reserved) vs reserved (grid-area). Default: false */
   overlay?: boolean
   occupancy?: Occupancy
   reveal?: Reveal
