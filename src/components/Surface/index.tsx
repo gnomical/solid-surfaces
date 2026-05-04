@@ -34,7 +34,7 @@ export function Surface(props: SurfaceProps) {
     if (props.overlay) {
       const span = props.span ?? "full"
       const gs = gridStructure()
-      // Grid placement constrains the absolute-positioned overlay's containing block.
+      // Grid placement positions the overlay as a grid item that self-aligns to fill its cell.
       // "full" covers all tracks; "inset" excludes crossing-axis rail tracks.
       const gridRow =
         span === "inset" && (props.edge === "left" || props.edge === "right")
@@ -67,7 +67,7 @@ export function Surface(props: SurfaceProps) {
     // For reserved surfaces, the grid cell is sized by the track (which starts at 0px),
     // so we observe the caller's content element — it carries the real CSS size
     // (e.g. width: 220px) independent of the grid track.
-    // Overlay surfaces are absolutely positioned and size themselves, so we observe them directly.
+    // Overlay surfaces are grid items that size themselves, so we observe them directly.
     const target = props.overlay ? surfaceEl : (animWrapperEl.firstElementChild as HTMLElement | null) ?? surfaceEl
 
     const ro = new ResizeObserver((entries) => {
