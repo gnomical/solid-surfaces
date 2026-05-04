@@ -134,7 +134,6 @@ export default function App() {
       </Show>
 
       <Body class="body">
-        <div class="body-content">
 
           <IntroSection
             onContinue={() => revealAndScroll(1, () => layoutRootSection)}
@@ -176,7 +175,6 @@ export default function App() {
           />
 
           <div class="copyright">© {new Date().getFullYear()} Jacob Kofron</div>
-        </div>
       </Body>
 
       <Overlay edge="bottom" open={overlayOpen()} span="full">

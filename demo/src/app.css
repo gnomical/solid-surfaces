@@ -192,16 +192,9 @@ blockquote {
 }
 
 .body {
-  position: relative;
-}
-
-.body-content {
-  position: absolute;
-  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: auto;
 }
 
 
