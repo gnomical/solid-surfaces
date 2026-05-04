@@ -133,7 +133,7 @@ export function Surface(props: SurfaceProps) {
       ref={(el) => { surfaceEl = el; props.domRef?.(el) }}
       class={props.class}
       classList={{
-        [styles.surface]: !props.overlay,
+        [styles.surface]: true,
         [styles.overlay]: !!props.overlay,
         [styles.hidden]: isHidden(),
       }}

@@ -1,4 +1,4 @@
-/* Reserved: renders inside CSS grid flow */
+/* Reserved surfaces render inside CSS grid flow; overlays reuse the same class */
 .surface {
   display: grid;
   overflow: hidden;
@@ -6,34 +6,10 @@
   min-height: 0;
 }
 
-/* Overlay: absolute, anchored to its edge, full cross-axis */
-.overlay {
-  position: absolute;
-}
-
-.overlay[data-ss-edge="left"] {
-  top: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.overlay[data-ss-edge="right"] {
-  top: 0;
-  bottom: 0;
-  right: 0;
-}
-
-.overlay[data-ss-edge="top"] {
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
-.overlay[data-ss-edge="bottom"] {
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
+.overlay[data-ss-edge="top"]    { align-self: start; }
+.overlay[data-ss-edge="bottom"] { align-self: end; }
+.overlay[data-ss-edge="left"]   { justify-self: start; }
+.overlay[data-ss-edge="right"]  { justify-self: end; }
 
 .hidden {
   pointer-events: none;
