@@ -21,6 +21,7 @@ export default function App() {
   const [ghostNav, setGhostNav] = createSignal(false)
   const [ghostHeader, setGhostHeader] = createSignal(false)
   const [ghostRight, setGhostRight] = createSignal(false)
+  const [ghostRightDrawer, setGhostRightDrawer] = createSignal(false)
   const [ghostDrawer, setGhostDrawer] = createSignal(false)
   const [headerAdded, setHeaderAdded] = createSignal(false)
   const [iconBarAdded, setIconBarAdded] = createSignal(false)
@@ -36,25 +37,26 @@ export default function App() {
 
   createEffect(() => {
     if (!layoutRootActivated()) return
-    setTimeout(() => setGhostIconBar(true),   ghostSpeed * 5)
+    setTimeout(() => setGhostIconBar(true),         ghostSpeed * 5)
 
-    setTimeout(() => setGhostRight(true),      ghostSpeed * 8)
-    setTimeout(() => setGhostRight(false),      ghostSpeed * 9)
-    setTimeout(() => setGhostHeader(true),     ghostSpeed * 10)
+    setTimeout(() => setGhostRightDrawer(true),     ghostSpeed * 8)
+    setTimeout(() => setGhostRightDrawer(false),    ghostSpeed * 10)
+    setTimeout(() => setGhostHeader(true),          ghostSpeed * 11)
 
-    setTimeout(() => setGhostNav(true),        ghostSpeed * 14)
-    setTimeout(() => setGhostRight(true),      ghostSpeed * 14)
+    setTimeout(() => setGhostNav(true),             ghostSpeed * 15)
+    setTimeout(() => setGhostRight(true),           ghostSpeed * 15)
 
-    setTimeout(() => setGhostDrawer(true),     ghostSpeed * 17)
-    setTimeout(() => setGhostDrawer(false),  ghostSpeed * 18)
+    setTimeout(() => setGhostDrawer(true),          ghostSpeed * 18)
+    setTimeout(() => setGhostDrawer(false),         ghostSpeed * 20)
 
-    setTimeout(() => setGhostRight(false),   ghostSpeed * 20)
-    setTimeout(() => setGhostIconBar(false), ghostSpeed * 20)
-    setTimeout(() => setGhostHeader(false),  ghostSpeed * 20)
-    setTimeout(() => setGhostNav(false),     ghostSpeed * 20)
-    setTimeout(() => setLayoutRootEmphasized(true),  ghostSpeed * 20)
+    setTimeout(() => setGhostRight(false),          ghostSpeed * 22)
+    setTimeout(() => setGhostIconBar(false),        ghostSpeed * 22)
+    setTimeout(() => setGhostHeader(false),         ghostSpeed * 22)
+    setTimeout(() => setGhostNav(false),            ghostSpeed * 22)
+    
+    setTimeout(() => setLayoutRootEmphasized(true), ghostSpeed * 24)
 
-    setTimeout(() => setLayoutRootComplete(true),  ghostSpeed * 22)
+    setTimeout(() => setLayoutRootComplete(true),   ghostSpeed * 26)
   })
 
   const revealAndScroll = (nextStep: number, getEl: () => HTMLElement) => {
@@ -84,8 +86,12 @@ export default function App() {
         <div class="surface vertical right ghost" style={{width: "200px"}} />
       </Rail>
 
-      <Overlay open={ghostDrawer()} edge="bottom" span="full">
-        <div class="surface horizontal drawer ghost" style={{height: "200px"}} />
+      <Overlay class="overlay" edge="right" open={ghostRightDrawer()} span="full">
+        <div class="surface vertical drawer right ghost" style={{width: "30vw"}} />
+      </Overlay>
+
+      <Overlay class="overlay" open={ghostDrawer()} edge="bottom" span="full">
+        <div class="surface horizontal drawer bottom ghost" style={{height: "25vh"}} />
       </Overlay>
 
       <Rail edge="top" visibility={step() >= 2 ? "visible" : "hidden"}>

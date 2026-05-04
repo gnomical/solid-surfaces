@@ -59,6 +59,9 @@ blockquote {
 @keyframes border-blink {
   50% { border-color: var(--stp-shadow); }
 }
+@keyframes border-blink-manual {
+  50% { border-color: var(--stp-shadow); }
+}
 
 /* Surface styling — consumers own this */
 .root {
@@ -70,10 +73,12 @@ blockquote {
     inset: 16px;
     border-width: var(--border-size);
     border-color: var(--stp-foreground);
+    animation: border-blink 0.2s steps(1) 0.5s;
+    animation-iteration-count: 2;
   }
   &.blink {
-    animation: border-blink 0.2s steps(1);
-    animation-iteration-count: 5;
+    animation: border-blink-manual 0.5s steps(1);
+    animation-iteration-count: 3;
   }
 }
 
@@ -85,7 +90,7 @@ blockquote {
   display: flex;
   gap: 1rem;
   &.ghost {
-    --border: var(--border-size) solid var(--stp-foreground-alpha-quaternary);
+    --border: var(--border-size) solid var(--stp-foreground-alpha-tertiary);
     pointer-events: none;
   }
   &.top {
@@ -111,13 +116,18 @@ blockquote {
   flex-direction: column;
 }
 
+.overlay {
+  padding: 1.5rem;
+}
+
 .drawer {
-  height: 200px;
   border: var(--border);
-  margin: 0 1rem 1rem;
   background: var(--stp-background-alpha-secondary);
   backdrop-filter: blur(10px);
   box-shadow: 6px 6px 0 var(--stp-foreground-alpha-tertiary);
+  &.ghost {
+    box-shadow: 6px 6px 0 var(--stp-foreground-alpha-quaternary);
+  }
 }
 
 .header {
