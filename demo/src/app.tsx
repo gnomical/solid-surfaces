@@ -110,16 +110,15 @@ export default function App() {
         </Overlay>
       </Show>
 
-      <Show when={iconBarAdded()}>
-        <Rail edge="left" order={0}>
-          <div class="surface vertical left icon-bar">
-            <Button size="sm" variant="secondary"></Button>
-            <Button size="sm" variant="secondary"></Button>
-            <Button size="sm" variant="secondary"></Button>
-            <Button size="sm" variant="secondary"></Button>
-          </div>
-        </Rail>
-      </Show>
+
+      <Rail edge="left" order={0} visibility={iconBarAdded() ? "visible" : "hidden"}>
+        <div class="surface vertical left icon-bar">
+          <Button size="sm" variant="secondary"></Button>
+          <Button size="sm" variant="secondary"></Button>
+          <Button size="sm" variant="secondary"></Button>
+          <Button size="sm" variant="secondary"></Button>
+        </div>
+      </Rail>
 
       <Show when={navAdded()}>
         <Rail edge="left" order={1} span={navSpan()}>
@@ -150,9 +149,9 @@ export default function App() {
           <RailsSection
             ref={(el) => { railsSection = el }}
             show={step() >= 2}
-            headerAdded={headerAdded}
-            setHeaderAdded={setHeaderAdded}
-            onContinue={headerAdded() ? () => revealAndScroll(3, () => iconBarSection) : undefined}
+            iconBarAdded={iconBarAdded}
+            setIconBarAdded={setIconBarAdded}
+            onContinue={iconBarAdded() ? () => revealAndScroll(3, () => iconBarSection) : undefined}
           />
 
           <AxisPrioritySection
