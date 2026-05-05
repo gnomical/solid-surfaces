@@ -1,0 +1,60 @@
+.wrapper {
+  position: relative;
+  cursor: pointer;
+
+  &:hover:not(.copied):not(:active) {
+    .code {
+      transform: translate(-2px, -2px);
+      box-shadow: 9px 9px 0 var(--stp-foreground-alpha-primary);
+    }
+    .copyIcon {
+      top: calc(1rem - 2px);
+      right: calc(1.25rem + 2px);
+    }
+  }
+
+  &:active:not(.clicked) {
+    .code {
+      transform: translate(2px, 2px);
+      box-shadow: 3px 3px 0 var(--stp-foreground-alpha-primary);
+    }
+    .copyIcon {
+      top: calc(1rem + 2px);
+      right: calc(1.25rem - 2px);
+    }
+  }
+}
+
+.code {
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  border: 2px solid var(--stp-foreground);
+  box-shadow: 5px 5px 0 var(--stp-foreground-alpha-primary);
+
+  pre {
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+.copyIcon {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--stp-foreground-alpha-tertiary);
+  pointer-events: none;
+
+  .wrapper:hover:not(.clicked) & {
+    color: var(--stp-foreground);
+  }
+
+  .wrapper.copied & {
+    color: var(--stp-foreground);
+  }
+}

@@ -14,7 +14,7 @@ export function Surface(props: SurfaceProps) {
     reveal: props.reveal ?? "always",
     visibility: props.visibility ?? "visible",
     order: props.order ?? 0,
-    span: props.span,
+    span: props.span ?? "full",
   })
 
   // Deliver handle synchronously so callers can wire effects against it

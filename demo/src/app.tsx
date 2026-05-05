@@ -1,122 +1,185 @@
-import { createSignal, For } from "solid-js"
-import { LayoutRoot, Rail, Overlay, Body } from "solid-surfaces"
-import type { AxisPriority } from "solid-surfaces"
+import { createSignal, createEffect, Show } from "solid-js"
+import { LayoutRoot, Overlay, Body, Rail } from "solid-surfaces"
 import "./app.css"
-import { CLOSE_ICON, SIDEBAR_ICON, SIDEBAR_ICON_FILLED } from "./lib/constants"
-import { Chip } from "./components/Chip"
+import { CLOSE_ICON } from "./lib/constants"
+import { Button } from "./components/Button"
+import { ThemeToggle } from "./components/ThemeToggle"
+import { IntroSection } from "./sections/intro"
+import { LayoutRootSection } from "./sections/layout-root"
+import { RailsSection } from "./sections/rails"
+import { AxisPrioritySection } from "./sections/axis-priority"
+import { StackingSection } from "./sections/stacking"
 
-const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-sunt in culpa qui officia deserunt mollit anim id est laborum.`
+const ghostSpeed = 200
 
 export default function App() {
+  const [step, setStep] = createSignal(0)
+  const [layoutRootActivated, setLayoutRootActivated] = createSignal(false)
+  const [layoutRootEmphasized, setLayoutRootEmphasized] = createSignal(false)
+  const [layoutRootComplete, setLayoutRootComplete] = createSignal(false)
+  const [ghostIconBar, setGhostIconBar] = createSignal(false)
+  const [ghostNav, setGhostNav] = createSignal(false)
+  const [ghostHeader, setGhostHeader] = createSignal(false)
+  const [ghostRight, setGhostRight] = createSignal(false)
+  const [ghostRightDrawer, setGhostRightDrawer] = createSignal(false)
+  const [ghostDrawer, setGhostDrawer] = createSignal(false)
+  const [headerAdded, setHeaderAdded] = createSignal(false)
+  const [iconBarAdded, setIconBarAdded] = createSignal(false)
+  const [navAdded, setNavAdded] = createSignal(false)
+  const [navSpan, setNavSpan] = createSignal<"inset" | "full">("full")
+  const [axisPriority, setAxisPriority] = createSignal<"horizontal" | "vertical">("vertical")
   const [overlayOpen, setOverlayOpen] = createSignal(false)
-  const [axisPriority, setAxisPriority] = createSignal<AxisPriority>("horizontal")
-  const [overlaySpanInset, setOverlaySpanInset] = createSignal(false)
-  const [navVisible, setNavVisible] = createSignal(false)
+
+  let layoutRootSection!: HTMLElement
+  let railsSection!: HTMLElement
+  let iconBarSection!: HTMLElement
+  let navSection!: HTMLElement
+
+  createEffect(() => {
+    if (!layoutRootActivated()) return
+    setTimeout(() => setGhostIconBar(true),         ghostSpeed * 5)
+
+    setTimeout(() => setGhostRightDrawer(true),     ghostSpeed * 8)
+    setTimeout(() => setGhostRightDrawer(false),    ghostSpeed * 10)
+    setTimeout(() => setGhostHeader(true),          ghostSpeed * 11)
+
+    setTimeout(() => setGhostNav(true),             ghostSpeed * 15)
+    setTimeout(() => setGhostRight(true),           ghostSpeed * 15)
+
+    setTimeout(() => setGhostDrawer(true),          ghostSpeed * 18)
+    setTimeout(() => setGhostDrawer(false),         ghostSpeed * 20)
+
+    setTimeout(() => setGhostRight(false),          ghostSpeed * 22)
+    setTimeout(() => setGhostIconBar(false),        ghostSpeed * 22)
+    setTimeout(() => setGhostHeader(false),         ghostSpeed * 22)
+    setTimeout(() => setGhostNav(false),            ghostSpeed * 22)
+    
+    setTimeout(() => setLayoutRootEmphasized(true), ghostSpeed * 24)
+
+    setTimeout(() => setLayoutRootComplete(true),   ghostSpeed * 26)
+  })
+
+  const revealAndScroll = (nextStep: number, getEl: () => HTMLElement) => {
+    setStep(nextStep)
+    queueMicrotask(() => getEl()?.scrollIntoView({ behavior: "smooth", block: "start" }))
+  }
 
   return (
-    <LayoutRoot class="root" axisPriority={axisPriority()}>
-      {/* Top rail — hides on scroll down, reveals on scroll up; span=full claims corners */}
-      <Rail edge="top" reveal="scroll-toward" span="full" visibility={navVisible() ? "visible" : "hidden"} animate>
-        <header class="surface horizontal header">
-          <span class="brand">solid-surfaces</span>
-          <Chip type="Rail" edge="top" reveal="scroll-toward" />
-          <button onClick={() => setOverlayOpen((v) => !v)} style="transform: rotate(-90deg)">
-            {overlayOpen() ? <SIDEBAR_ICON_FILLED /> : <SIDEBAR_ICON />}
-          </button>
-        </header>
+    <LayoutRoot class="root" axisPriority={axisPriority()} classList={{
+      "activated": layoutRootActivated(),
+      "blink": layoutRootEmphasized(),
+    }}>
+
+      <Rail edge="top" visibility={ghostHeader() ? "visible" : "hidden"}>
+        <div class="surface horizontal top ghost" style={{height: "70px"}}/>
       </Rail>
 
-      {/* Left rail (order=0) — icon bar, reserved on desktop */}
-      <Rail edge="left" order={0}>
-        <nav class="surface vertical nav icon-bar">
-          <span class="nav-icon">⊞</span>
-          <span class="nav-icon">⊟</span>
-          <span class="nav-icon">⊠</span>
-          <div style={{ "margin-top": "auto", "width": "1.2em" }}>
-            <Chip vertical type="Rail" edge="left" order={0} />
-          </div>
-        </nav>
+      <Rail edge="left" span="inset" visibility={ghostIconBar() ? "visible" : "hidden"}>
+        <div class="surface vertical left ghost" style={{width: "60px"}}/>
       </Rail>
 
-      {/* Left rail (order=1) — file tree, inset from the icon bar */}
-      <Rail edge="left" order={1} responsive breakpoint={768} animate visibility={navVisible() ? "visible" : "hidden"}>
-        <nav class="surface vertical nav">
-          <span>Nav item 1</span>
-          <span>Nav item 2</span>
-          <span>Nav item 3</span>
-          <div style={{ "margin-top": "auto"}}>
-            <Chip vertical type="Rail" edge="left" order={1} breakpoint={768} />
-          </div>
-        </nav>
+      <Rail edge="left" span="inset" visibility={ghostNav() ? "visible" : "hidden"}>
+        <div class="surface vertical left ghost" style={{width: "200px"}} />
       </Rail>
 
-      {/* Body */}
-      <Body>
-        <div class="body-content">
-          <h1>Solid-Surfaces Demo</h1>
+      <Rail edge="right" visibility={ghostRight() ? "visible" : "hidden"}>
+        <div class="surface vertical right ghost" style={{width: "200px"}} />
+      </Rail>
 
-          <div class="controls">
-            <label>
-              <span>axisPriority</span>
-              <select
-                value={axisPriority()}
-                onChange={(e) => setAxisPriority(e.currentTarget.value as AxisPriority)}
-              >
-                <option value="horizontal">horizontal (top/bottom own corners)</option>
-                <option value="vertical">vertical (left/right own corners)</option>
-              </select>
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={overlaySpanInset()}
-                onChange={(e) => setOverlaySpanInset(e.currentTarget.checked)}
-              />
-              {" "}Overlay span="inset" (bounded by top rail)
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={navVisible()}
-                onChange={(e) => setNavVisible(e.currentTarget.checked)}
-              />
-              {" "}Nav rail visible (animate)
-            </label>
-          </div>
+      <Overlay class="overlay" edge="right" open={ghostRightDrawer()} span="full">
+        <div class="surface vertical drawer right ghost" style={{width: "30vw"}} />
+      </Overlay>
 
-          <p>
-            Two left Rails with different <code>order</code> values each get their own
-            column track. The top Rail uses <code>span="full"</code>. Toggle{" "}
-            <code>axisPriority</code> above to shift corner ownership between the top/bottom
-            and left/right rails.
-          </p>
-          <p>
-            Resize below 768px to collapse both left rails to overlay mode. Scroll to
-            hide/reveal the top rail.
-          </p>
-          <For each={Array.from({ length: 20 })}>
-            {(_, i) => (
-              <p>
-                <strong>Paragraph {i() + 1}:</strong> {LOREM}
-              </p>
-            )}
-          </For>
+      <Overlay class="overlay" open={ghostDrawer()} edge="bottom" span="full">
+        <div class="surface horizontal drawer bottom ghost" style={{height: "25vh"}} />
+      </Overlay>
+
+      <Rail edge="top" visibility={step() >= 2 ? "visible" : "hidden"}>
+        <div class="surface horizontal top header">
+          <span class="brand">Surface Kit</span>
+          <ThemeToggle classList={{'theme-toggle': true}}/>
         </div>
+      </Rail>
+
+      { /* theme toggle before the demo gets started */}
+      <Show when={!layoutRootActivated()}>
+        <Overlay edge="top" open={true} span="inset">
+          <div class="surface horizontal header">
+            <ThemeToggle classList={{'theme-toggle': true}}/>
+          </div>
+        </Overlay>
+      </Show>
+
+
+      <Rail edge="left" order={0} visibility={iconBarAdded() ? "visible" : "hidden"}>
+        <div class="surface vertical left icon-bar">
+          <Button size="sm" variant="secondary"></Button>
+          <Button size="sm" variant="secondary"></Button>
+          <Button size="sm" variant="secondary"></Button>
+          <Button size="sm" variant="secondary"></Button>
+        </div>
+      </Rail>
+
+      <Show when={navAdded()}>
+        <Rail edge="left" order={1} span={navSpan()}>
+          <div class="surface vertical left nav">
+            <span class="brand">Nav</span>
+            <div class="nav-item"><span class="nav-icon">⌂</span><span>Home</span></div>
+            <div class="nav-item"><span class="nav-icon">◫</span><span>Layout</span></div>
+            <div class="nav-item"><span class="nav-icon">◈</span><span>Surfaces</span></div>
+            <div class="nav-item"><span class="nav-icon">⚙</span><span>Settings</span></div>
+          </div>
+        </Rail>
+      </Show>
+
+      <Body class="body">
+
+          <IntroSection
+            onContinue={() => revealAndScroll(1, () => layoutRootSection)}
+          />
+
+          <LayoutRootSection
+            ref={(el) => { layoutRootSection = el }}
+            show={step() >= 1}
+            layoutRootActivated={layoutRootActivated}
+            setLayoutRootActivated={setLayoutRootActivated}
+            onContinue={layoutRootComplete() ? () => revealAndScroll(2, () => railsSection) : undefined}
+          />
+
+          <RailsSection
+            ref={(el) => { railsSection = el }}
+            show={step() >= 2}
+            iconBarAdded={iconBarAdded}
+            setIconBarAdded={setIconBarAdded}
+            onContinue={iconBarAdded() ? () => revealAndScroll(3, () => iconBarSection) : undefined}
+          />
+
+          <AxisPrioritySection
+            ref={(el) => { iconBarSection = el }}
+            show={step() >= 3}
+            iconBarAdded={iconBarAdded}
+            setIconBarAdded={setIconBarAdded}
+            axisPriority={axisPriority}
+            setAxisPriority={setAxisPriority}
+            onContinue={iconBarAdded() ? () => revealAndScroll(4, () => navSection) : undefined}
+          />
+
+          <StackingSection
+            ref={(el) => { navSection = el }}
+            show={step() >= 4}
+            navAdded={navAdded}
+            setNavAdded={setNavAdded}
+            navSpan={navSpan}
+            setNavSpan={setNavSpan}
+          />
+
+          <div class="copyright">© {new Date().getFullYear()} Jacob Kofron</div>
       </Body>
 
-      {/* Bottom overlay — demonstrates span="inset" vs span="full" */}
-      <Overlay edge="bottom" open={overlayOpen()} span={overlaySpanInset() ? "inset" : "full"}>
+      <Overlay edge="bottom" open={overlayOpen()} span="full">
         <div class="surface drawer">
-          <Chip type="Overlay" edge="bottom" span={overlaySpanInset() ? "inset" : "full"} />
           <p style={{ "margin-top": "0.5rem" }}>
-            {overlaySpanInset()
-              ? "span=\"inset\": bounded by the left rail column tracks."
-              : "span=\"full\": stretches edge to edge."}
+            An <code>Overlay</code> surface — edge-attached, but not reserved in the grid.
           </p>
           <button onClick={() => setOverlayOpen(false)} class="close">
             {CLOSE_ICON()}

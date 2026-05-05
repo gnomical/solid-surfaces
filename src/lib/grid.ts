@@ -8,10 +8,12 @@ import type {
 
 /** Returns true for surfaces that occupy a reserved grid track. Shared by buildGridLayout and getGridStructure. */
 export function isReservedActive(s: RegisteredSurface): boolean {
-  return (
-    (s.occupancy === "reserved" || s.occupancy === "visible-driven") &&
-    !(s.occupancy === "visible-driven" && s.visibility === "hidden")
-  )
+  if (s.occupancy === "none") return false
+  if (s.occupancy === "visible-driven" && s.visibility === "hidden") return false
+  // A hidden reserved surface with zero/no reservedSize is fully off-screen (not mid-animation).
+  // Exclude it so it doesn't claim a grid column/row and corrupt corner resolution.
+  if (s.visibility === "hidden" && (s.reservedSize === undefined || s.reservedSize === "0px")) return false
+  return true
 }
 
 export function trackSize(surface: RegisteredSurface | undefined): string {
