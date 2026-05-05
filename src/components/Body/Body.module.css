@@ -1,7 +1,6 @@
 .body {
   grid-area: ss-body;
   overflow: auto;
-  overflow-anchor: none;
   min-width: 0;
   min-height: 0;
 }

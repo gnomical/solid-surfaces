@@ -6,7 +6,7 @@ import type { SurfaceProps } from "../../lib/solid-types"
 import styles from "./Surface.module.css"
 
 export function Surface(props: SurfaceProps) {
-  const { gridStructure, updateSurface, scrollContainer } = useLayout()
+  const { gridStructure, updateSurface } = useLayout()
 
   const handle = createSurface({
     edge: props.edge,
@@ -94,22 +94,12 @@ export function Surface(props: SurfaceProps) {
       animWrapperEl.style.transform = `translate${translateAxis}(${sign * offset}px)`
     }
 
-    const adjustsScroll = props.edge === "top" || props.edge === "left"
-
     const ctrl = new SlideController({
       edge: props.edge,
       getActualSize: () => parseFloat(handle.actualSize()) || 0,
       onReservedSizeChange: (size) => updateSurface(handle.id, { reservedSize: size }),
       onVisibilityChange: (v) => handle.setVisibility(v),
       onTransformChange: applyTransform,
-      onScrollAdjust: adjustsScroll
-        ? (delta) => {
-            const container = scrollContainer()
-            if (!container) return
-            if (props.edge === "top") container.scrollTop -= delta
-            else container.scrollLeft -= delta
-          }
-        : undefined,
     }, handle.visibility())
 
     onCleanup(() => ctrl.disconnect())

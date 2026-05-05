@@ -6,10 +6,6 @@ export type SlideControllerOptions = {
   onReservedSizeChange: (size: string | undefined) => void
   onVisibilityChange: (v: Visibility) => void
   onTransformChange: (offset: number | null) => void
-  /** Called each frame with the signed pixel change in reservedSize.
-   *  Caller should subtract this from scrollTop/scrollLeft to hold content in place.
-   *  Only wired for top/left edges. */
-  onScrollAdjust?: (delta: number) => void
 }
 
 /**
@@ -26,7 +22,6 @@ export class SlideController {
   private offsetFraction = 0
   private rafId: number | null = null
   private target: "visible" | "hidden" = "visible"
-  private prevReservedSize: number | null = null
 
   constructor(opts: SlideControllerOptions, initialVisibility: "visible" | "hidden" = "visible") {
     this.opts = opts
@@ -69,9 +64,6 @@ export class SlideController {
 
   private startRaf(): void {
     if (this.rafId !== null) cancelAnimationFrame(this.rafId)
-    // Seed prevReservedSize from the current fractional position so the first
-    // commitFraction call (and any direction reversal) produces a correct delta.
-    this.prevReservedSize = Math.max(0, this.opts.getActualSize() * (1 - this.offsetFraction))
     const targetFraction = this.target === "hidden" ? 1 : 0
     const step = () => {
       const diff = targetFraction - this.offsetFraction
@@ -95,17 +87,11 @@ export class SlideController {
     const actualSize = this.opts.getActualSize()
     const offset = this.offsetFraction * actualSize
     const reservedSize = Math.max(0, actualSize - offset)
-    if (this.opts.onScrollAdjust !== undefined && this.prevReservedSize !== null) {
-      const delta = reservedSize - this.prevReservedSize
-      if (delta !== 0) this.opts.onScrollAdjust(delta)
-    }
-    this.prevReservedSize = reservedSize
     this.opts.onReservedSizeChange(`${reservedSize}px`)
     this.opts.onTransformChange(offset)
   }
 
   private settle(): void {
-    this.prevReservedSize = null
     if (this.target === "hidden") {
       this.opts.onVisibilityChange("hidden")
       // Keep reservedSize at "0px" — clearing it would revert to actualSize and cause a snap
